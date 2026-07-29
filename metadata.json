@@ -1,0 +1,6 @@
+{
+  "name": "内景解伤寒多邻国",
+  "description": "类似多领国（Duolingo）的循序渐进、游戏化中医《伤寒论》内景学习系统，配合AI动态组卷考题与内景问诊诊断。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

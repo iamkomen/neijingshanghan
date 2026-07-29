@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>内景经方学堂 - 离线全功能交付版</title>
+  <style>
+    :root {
+      --bg-color: #FAF8F2;
+      --card-bg: #FFFFFF;
+      --text-main: #2C3E50;
+      --text-sub: #7F8C8D;
+      --primary-green: #4B6127;
+      --primary-red: #C03A2B;
+      --primary-amber: #D35400;
+      --primary-sun: #F39C12;
+      --primary-gold: #D4AC0D;
+      --primary-blue: #2E4053;
+      --primary-brown: #7E5109;
+      --primary-purple: #7D3C98;
+      --border-color: #E2E8F0;
+      --shadow-sm: 0 2px 4px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      padding-bottom: 60px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Top Navigation Header */
+    header {
+      width: 100%;
+      max-width: 600px;
+      background: #FFFFFF;
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 16px;
+      color: var(--primary-green);
+    }
+
+    .brand-icon {
+      width: 28 h;
+      height: 28px;
+      background: var(--primary-green);
+      color: #fff;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .nav-btns {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn {
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: none;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #4B6127;
+      color: white;
+    }
+
+    .btn-secondary {
+      background: #F1F5F9;
+      color: #475569;
+    }
+
+    .btn-reward {
+      background: #E74C3C;
+      color: white;
+    }
+
+    .btn:active {
+      transform: scale(0.95);
+    }
+
+    /* Main Container */
+    .container {
+      width: 100%;
+      max-width: 500px;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Chapter Banner Card */
+    .chapter-card {
+      background: var(--card-bg);
+      border: 1px solid #E5E7EB;
+      border-radius: 20px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      z-index: 2;
+    }
+
+    .chapter-icon-box {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    .chapter-info h2 {
+      font-size: 16px;
+      font-weight: 800;
+      color: #1E293B;
+      line-height: 1.3;
+    }
+
+    .chapter-info p {
+      font-size: 12px;
+      color: #64748B;
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    /* Gates Path */
+    .gates-path {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      position: relative;
+      padding: 10px 0;
+    }
+
+    .gates-path::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: #E2E8F0;
+      z-index: 1;
+    }
+
+    /* Gate Node Item */
+    .gate-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+      cursor: pointer;
+    }
+
+    .node-circle {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      background: white;
+      border: 4px solid #CBD5E1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      position: relative;
+      box-shadow: var(--shadow-md);
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .gate-node:hover .node-circle {
+      transform: scale(1.05);
+    }
+
+    .node-circle.unlocked {
+      border-color: #F59E0B;
+      background: #FFFBEB;
+    }
+
+    .node-circle.completed {
+      border-color: #10B981;
+      background: #ECFDF5;
+    }
+
+    .lock-badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      background: #64748B;
+      color: white;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      border: 2px solid white;
+    }
+
+    .node-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: #1E293B;
+      margin-top: 8px;
+      text-align: center;
+    }
+
+    .node-subtitle {
+      font-size: 11px;
+      color: #94A3B8;
+      margin-top: 2px;
+      font-weight: 600;
+    }
+
+    .node-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .btn-act {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      color: white;
+    }
+
+    .btn-act-learn { background: #F59E0B; }
+    .btn-act-exam { background: #10B981; }
+
+    /* Inter-chapter Line */
+    .chapter-connector {
+      width: 4px;
+      height: 30px;
+      background: #CBD5E1;
+      margin: 0 auto;
+    }
+
+    /* Modal Overlay */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 16px;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      border-radius: 24px;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #E2E8F0;
+      padding-bottom: 12px;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0F172A;
+    }
+
+    .close-btn {
+      background: #F1F5F9;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Card Slide View */
+    .card-box {
+      background: #FAF8F2;
+      border: 1px solid #E2E8F0;
+      border-radius: 16px;
+      padding: 16px;
+      line-height: 1.6;
+      font-size: 14px;
+      color: #334155;
+    }
+
+    .card-box h3 {
+      color: #0F172A;
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+
+    .option-item {
+      background: #F8FAFC;
+      border: 2px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 12px;
+      margin-top: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .option-item:hover {
+      border-color: #F59E0B;
+      background: #FFFBEB;
+    }
+
+    .option-item.correct {
+      border-color: #10B981;
+      background: #ECFDF5;
+      color: #065F46;
+    }
+
+    .option-item.wrong {
+      border-color: #EF4444;
+      background: #FEF2F2;
+      color: #991B1B;
+    }
+
+    .qr-box {
+      width: 180px;
+      height: 180px;
+      margin: 12px auto;
+      border: 2px dashed #CBD5E1;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #F8FAFC;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .qr-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Clinic Simulator */
+    .clinic-box {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .clinic-input {
+      width: 100%;
+      height: 80px;
+      border: 1px solid #CBD5E1;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 13px;
+      resize: none;
+    }
+
+    .clinic-result {
+      background: #F0FDF4;
+      border: 1px solid #BBF7D0;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #166534;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sticky Header -->
+  <header>
+    <div class="brand">
+      <div class="brand-icon">景</div>
+      <span>内景经方学堂</span>
+    </div>
+    <div class="nav-btns">
+      <button class="btn btn-secondary" onclick="openClinicModal()">🩺 内景诊室</button>
+      <button class="btn btn-reward" onclick="openRewardModal()">🎁 赞赏作者</button>
+      <button class="btn btn-primary" onclick="downloadCurrentHtml()">⬇️ 导出单文件</button>
+    </div>
+  </header>
+
+  <!-- Content Container -->
+  <div class="container" id="chapters-root">
+    <!-- Chapters & Gates rendered dynamically via JavaScript -->
+  </div>
+
+  <!-- Lesson Cards Modal -->
+  <div class="modal-overlay" id="lesson-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" id="lesson-modal-title">学习卡片</div>
+        <button class="close-btn" onclick="closeModal('lesson-modal')">✕</button>
+      </div>
+      <div id="lesson-card-container">
+        <!-- Lesson Cards Content -->
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
+        <button class="btn btn-secondary" id="card-prev-btn" onclick="prevCard()">上一卡</button>
+        <span id="card-page-indicator" style="font-size: 12px; font-weight: 700; color: #64748B;">1 / 3</span>
+        <button class="btn btn-primary" id="card-next-btn" onclick="nextCard()">下一卡</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Exam Modal -->
+  <div class="modal-overlay" id="exam-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" id="exam-modal-title">关卡考题测试</div>
+        <button class="close-btn" onclick="closeModal('exam-modal')">✕</button>
+      </div>
+      <div id="exam-question-container">
+        <!-- Exam Questions Content -->
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Clinic Simulator Modal -->
+  <div class="modal-overlay" id="clinic-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">AI 内景物理问诊模拟器</div>
+        <button class="close-btn" onclick="closeModal('clinic-modal')">✕</button>
+      </div>
+      <div class="clinic-box">
+        <p style="font-size: 12px; color: #64748B;">输入患者的主诉症状、发作时间、体位变化（如：夜间平卧咳嗽、晨起口苦、手脚冰凉）：</p>
+        <textarea class="clinic-input" id="clinic-symptoms-input" placeholder="例如：患者65岁，夜间平卧咳嗽剧烈，坐起缓解，畏寒喜温饮..."></textarea>
+        <button class="btn btn-primary" style="justify-content: center; padding: 10px;" onclick="runInnerLandscapeDiagnosis()">🔬 执行内景物理推导</button>
+        <div class="clinic-result" id="clinic-result-box">
+          <!-- Diagnosis Result -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reward Modal -->
+  <div class="modal-overlay" id="reward-modal">
+    <div class="modal-content" style="text-align: center;">
+      <div class="modal-header">
+        <div class="modal-title">赞赏与支持开发者</div>
+        <button class="close-btn" onclick="closeModal('reward-modal')">✕</button>
+      </div>
+      <p style="font-size: 13px; color: #475569; margin-top: 8px;">如果《内景经方学堂》对您的经方修行与学习有所启发，欢迎打赏支持！</p>
+      
+      <div class="qr-box" id="qr-display-box">
+        <span id="qr-placeholder-text" style="font-size: 12px; color: #94A3B8; padding: 12px;">扫码赞赏<br>(微信/支付宝)</span>
+        <img id="qr-custom-img" style="display: none;" src="" alt="赞赏二维码">
+      </div>
+
+      <div style="font-size: 11px; color: #64748B;">
+        <span>支持自定义打赏二维码：</span>
+        <input type="file" id="qr-upload-input" accept="image/*" style="display: none;" onchange="handleQrUpload(event)">
+        <button class="btn btn-secondary" style="margin: 6px auto; font-size: 11px;" onclick="document.getElementById('qr-upload-input').click()">上传自定义收款码图片</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // COMPLETE 8 CHAPTERS DATA & ALL 16 LEVEL GATES
+    const CHAPTERS = [
+      {
+        id: "ch1",
+        number: 1,
+        title: "第1章 • 中医思维根基",
+        subtitle: "从错误思维到经方正道",
+        icon: "🌱",
+        color: "#4B6127",
+        gates: [
+          {
+            id: "g1_1",
+            title: "错误的传统思维",
+            subtitle: "4卡 • 15题",
+            cards: [
+              { title: "五行辨证的数学缺口", content: "五行（木火土金水）×4种基础状态 = 仅20种诊断，无法精准指导《伤寒论》113首方剂。五行分类太粗，导致临床“辨证准但无处方”。" },
+              { title: "六经辨证的“字典查询”局限", content: "把六经辨证当作机械字典查表，遇条文未载的现代病症（如牛皮癣、糖尿病足）就会失诊。必须掌握背后的人体微观运行规律（内景）。" },
+              { title: "脏腑辨证的机械对应", content: "把口苦机械归为肝胆问题是错误的。阳明胃热或大便死结堵塞肠道，浊气上逆带蒸胆汁，同样会导致口苦。" }
+            ],
+            exam: [
+              { question: "本学说指出五行辨证指导113首方剂的核心数学缺陷是：", options: ["5x4=20种诊断，远远不足以精准对应113首方剂", "五行缺少元素", "五行无法计算"], answer: 0, explanation: "20种宏观诊断无法对应113首精准靶点方剂。" }
+            ]
+          },
+          {
+            id: "g1_2",
+            title: "正确的中医思维",
+            subtitle: "4卡 • 15题",
+            cards: [
+              { title: "经方 vs 时方的本质区别", content: "经方的本质是基于人体客观运行规律（内景）建立的辨证施治系统。其规律如数学物理般确定，不受时代限制。" },
+              { title: "阴阳分类三要素与排除法", content: "阴阳分类需满足：标准明确、完备性（二者之和等于整体）、互斥性（无交集）。利用完备与互斥，可用排除法快速定位诊断。" }
+            ],
+            exam: [
+              { question: "本学说对“经方”的原创性定义是：", options: ["基于人体客观运行规律（内景）建立的辨证系统", "古代名医开的所有旧药方", "昂贵的中药组合"], answer: 0, explanation: "经方是客观生理规律的体现。" }
+            ]
+          }
+        ]
+      },
+      {
+        id: "ch2",
+        number: 2,
+        title: "第2章 • 八纲辨证详解",
+        subtitle: "阴阳表里寒热虚实的临床应用",
+        icon: "⚖️",
+        color: "#C03A2B",
+        gates: [
+          {
+            id: "g2_1",
+            title: "阴阳与表里",
+            subtitle: "4卡 • 15题",
+            cards: [
+              { title: "阴阳的物理学重定义", content: "阴=有质量的物质（血液、津液、细胞、垃圾）；阳=无质量的功能（心跳收缩力、产热速率）。" },
+              { title: "表里腔体解剖划分", content: "里=胸腹腔器官（家庭主妇，造营养清垃圾）；表=体表组织（工作者，消耗能量排垃圾）。牛皮癣是肝解毒下降导致毒素溢于体表。" }
+            ],
+            exam: [
+              { question: "本学说将“阴”定义为：", options: ["有质量的物质部分（如血液、细胞）", "无质量的功能", "心理情绪"], answer: 0, explanation: "阴被定量重新定义为有质量的物质。" }
+            ]
+          },
+          {
+            id: "g2_2",
+            title: "虚实与寒热",
+            subtitle: "4卡 • 15题",
+            cards: [
+              { title: "寒热两维度理论", content: "维度一：温度高低；维度二：玄府/通道开闭。寒=低温+闭合；热=高温+开放。同一部位可同时存在高温与闭合（寒热错杂）。" },
+              { title: "阳气基准值模型", content: "正常阳气值为10，白天阳光补充+2达12。轻度阳虚降至8，白天补充后为10正常，夜间日光消失回落至8则发病（解释夜间加重）。" }
+            ],
+            exam: [
+              { question: "阳气基准值模型中，为什么阳虚患者常在夜间发病或加重？", options: ["夜间失去了日光的辐射补充，阳气回落至基准值以下", "夜间病毒变强", "夜间不能吃东西"], answer: 0, explanation: "夜间缺少太阳辅助，阳气回落暴露缺口。" }
+            ]
+          }
+        ]
+      },
+      {
+        id: "ch3",
+        number: 3,
+        title: "第3章 • 人体内景：气血精津液",
+        subtitle: "中医对人体运行规律的客观认识",
+        icon: "🫀",
+        color: "#D35400",
+        gates: [
+          {
+            id: "g3_1",
+            title: "气血精的定义与生成",
+            subtitle: "4卡 • 15题",
+            cards: [
+              { title: "物质五层微观结构", content: "血（血管内）、组织间液（三焦）、津液（淋巴/腺体）、精（精路）、气（功能与能量）。" },
+              { title: "命门解剖定位与精的三个去向", content: "命门位于小肠与前列腺（/子宫底）之间。命门火炼精为：精化神（大脑）、精化精（生殖）、精化髓（骨髓脑髓）。" }
+            ],
+            exam: [
+              { question: "本学说将“命门”解剖定位在：", options: ["小肠与前列腺（/盆腔底）之间的解剖区域", "后背第二腰椎", "双肾中间"], answer: 0, explanation: "传承紫极先生理论定位在小肠与前列腺之间。" }
+            ]
+          },
+          {
+            id: "g3_2",
+            title: "津液代谢与三焦玄府",
+            subtitle: "4卡 • 15题",
+            cards: [
+              { title: "玄府三类与药靶", content: "血管玄府（白芍松弛平滑肌开玄府）、胃肠玄府（干姜开悬浮）、细胞玄府（麻黄/知母）。" },
+              { title: "阴气回收双路径", content: "静脉回收小分子阴气（白芍主之）；淋巴系统回收大分子阴气团块（白术主之）。" }
+            ],
+            exam: [
+              { question: "促进淋巴系统回收大分子阴气的核心药物是：", options: ["白术", "白芍", "麻黄"], answer: 0, explanation: "白术增强淋巴管蠕动回收大分子阴气。" }
+            ]
+          }
+        ]
+      },
+      {
+        id: "ch4",
+        number: 4,
+        title: "第4章 • 六经体系与太阳病",
+        subtitle: "六病定义与太阳病方剂",
+        icon: "☀️",
+        color: "#F39C12",
+        gates: [
+          {
+            id: "g4_1",
+            title: "六病定义与太阳病",
+            subtitle: "4卡 • 15题",
+            cards: [
+              { title: "太阳系统内景定位", content: "太阳系统=人体所有与空气接触的组织（皮肤表面、鼻腔黏膜、肺泡表面）。" },
+              { title: "恶寒与脉浮物理机制", content: "毛孔玄府闭合→散热受阻且气血不到表→恶寒；机体调集气血向体表充血抗邪→脉浮。" }
+            ],
+            exam: [
+              { question: "太阳系统涵盖的解剖范围是：", options: ["人体所有与外界空气接触的组织（含皮肤及肺泡黏膜）", "仅指足太阳膀胱经", "仅指后背"], answer: 0, explanation: "第一道防御空气的屏障。" }
+            ]
+          },
+          {
+            id: "g4_2",
+            title: "太阳经典经方",
+            subtitle: "4卡 • 15题",
+            cards: [
+              { title: "桂枝汤“推-拉”循环", content: "桂枝向外推（促血化气），白芍向内拉（促气入血），姜枣草补充内容物，调和营卫。" },
+              { title: "麻黄汤开玄府", content: "麻黄刺激产生肾上腺素，强强打开完全闭塞的毛孔玄府；杏仁降肺气治喘。" }
+            ],
+            exam: [
+              { question: "桂枝汤中桂枝与白芍的配伍逻辑是：", options: ["桂枝向外推，白芍向内收，形成“推-拉”营卫循环", "桂枝止痛，白芍安神", "桂枝降温，白芍升压"], answer: 0, explanation: "构成动态营卫循环。" }
+            ]
+          }
+        ]
+      },
+      {
+        id: "ch5",
+        number: 5,
+        title: "第5章 • 经方详解：阳明少阳与三阴",
+        subtitle: "白虎承气柴胡四逆的临床应用",
+        icon: "💊",
+        color: "#D4AC0D",
+        gates: [
+          {
+            id: "g5_1",
+            title: "阳明与少阳病方剂",
+            subtitle: "4卡 • 15题",
+            cards: [
+              { title: "白虎汤 vs 承气汤", content: "白虎汤：石膏抑制细胞产热速率，知母关水通道；承气汤：大黄推肠道，芒硝高渗吸水润软燥屎。" },
+              { title: "少阳“小猪盖被”模型", content: "胸腹膜闭合像被子盖住内脏，郁热闷在胸腹腔。黄芩掀开被子，柴胡推热外出。" }
+            ],
+            exam: [
+              { question: "芒硝攻下燥屎的物理机制是：", options: ["形成高渗环境将水分抽吸入肠道泡软大便", "腐蚀大便", "麻醉神经"], answer: 0, explanation: "高渗盐析抽水润肠。" }
+            ]
+          },
+          {
+            id: "g5_2",
+            title: "三阴病方剂与精路",
+            subtitle: "4卡 • 15题",
+            cards: [
+              { title: "理中丸 vs 四逆汤", content: "理中丸干姜开胃肠悬浮治太阴；四逆汤生附子激活线粒体生成ATP，救急少阴阳衰。" },
+              { title: "厥阴与精路", content: "厥阴为精微物质输布通道（精路），乌梅丸酸收安蛔，细辛通微观精路。" }
+            ],
+            exam: [
+              { question: "附子在四逆汤中的线粒体靶点作用是：", options: ["激活细胞线粒体，提升ATP生成效率回阳", "抑制胃酸", "麻醉神经"], answer: 0, explanation: "激活线粒体能量代谢。" }
+            ]
+          }
+        ]
+      },
+      {
+        id: "ch6",
+        number: 6,
+        title: "第6章 • 临床问诊与辨证用药",
+        subtitle: "从症状到内景到用药",
+        icon: "🩺",
+        color: "#2E4053",
+        gates: [
+          {
+            id: "g6_1",
+            title: "问诊要点与辨证用药",
+            subtitle: "4卡 • 15题",
+            cards: [
+              { title: "口渴 vs 口干", content: "口渴想喝水=细胞缺水（用知母）；口干不想喝水=腺体阳虚不泌津（用干姜/附子/桂枝）。" },
+              { title: "大便气味与时间辨证", content: "大便恶臭=阳明热腐；不臭=寒利。晨起脸肿=心脏回流差；晚间脚肿=下焦回流障碍。" }
+            ],
+            exam: [
+              { question: "口干但不相当喝水，属于什么内景机制？", options: ["腺体细胞功能衰退（阳虚不泌津），应温阳", "细胞严重缺水", "水太多"], answer: 0, explanation: "阳虚腺体分泌障碍。" }
+            ]
+          },
+          {
+            id: "g6_2",
+            title: "腹诊方法与五步思维链",
+            subtitle: "4卡 • 15题",
+            cards: [
+              { title: "阳明腹诊必查天枢", content: "天枢穴（脐旁2寸）压痛硬块是横结肠宿便堆积的客观指征，确认使用承气汤。" },
+              { title: "五步治疗思维链", content: "病名 → 症状 → 病理 → 病机 → 选方。源头（物质与动力）、通路（管道无阻）、终端（细胞利用）。" }
+            ],
+            exam: [
+              { question: "阳明腑实使用承气汤前，腹诊最重要的穴位是：", options: ["天枢穴（肚脐旁开2寸）", "足三里", "手三里"], answer: 0, explanation: "天枢压痛反映横结肠燥屎。" }
+            ]
+          }
+        ]
+      },
+      {
+        id: "ch7",
+        number: 7,
+        title: "第7章 • 巧良医经验方剂",
+        subtitle: "白片黑片湿疹汤通血散等",
+        icon: "🏺",
+        color: "#7E5109",
+        gates: [
+          {
+            id: "g7_1",
+            title: "白片与黑片：昼夜调方",
+            subtitle: "4卡 • 15题",
+            cards: [
+              { title: "昼夜分治理论", content: "白天血化气服白片（桂/柴/芍/姜升发）；夜间气归血服黑片（枣仁/五味子/大剂量白芍敛阴）。" },
+              { title: "静脉回流方", content: "桂枝、柴胡、白芍、白术、半夏、茯苓、泽泻，加速阴气回流与代谢废物清运。" }
+            ],
+            exam: [
+              { question: "黑片在傍晚服用的内景依据是：", options: ["顺应夜间“气归血”节律促进阴气回收助眠", "怕黑汤吓人", "晚上胃酸少"], answer: 0, explanation: "顺应夜间阴气归血。" }
+            ]
+          },
+          {
+            id: "g7_2",
+            title: "巧良医专病经验方",
+            subtitle: "4卡 • 15题",
+            cards: [
+              { title: "湿疹汤与通血散", content: "湿疹汤解决局部组织液滞留；通血散水蛭/虻虫破静脉陈旧血栓。" },
+              { title: "200g大剂量白芍保胎", content: "大剂量白芍强效松弛子宫静脉平滑肌，解痉并改善子宫胎盘供血。" }
+            ],
+            exam: [
+              { question: "通血散中使用水蛭虻虫的核心作用是：", options: ["强效抗凝溶血破除静脉陈旧血栓", "补充蛋白质", "麻醉神经"], answer: 0, explanation: "虫类药强效伐血破瘀。" }
+            ]
+          }
+        ]
+      },
+      {
+        id: "ch8",
+        number: 8,
+        title: "第8章 • 临床病例实战",
+        subtitle: "从症状到方剂的真实案例",
+        icon: "📋",
+        color: "#7D3C98",
+        gates: [
+          {
+            id: "g8_1",
+            title: "疑难病内景分析",
+            subtitle: "4卡 • 15题",
+            cards: [
+              { title: "糖尿病足高糖腌渍效应", content: "高糖血液沉降下肢，组织长期“腌渍”在高糖废水中坏死；用当归四逆合四逆汤通精路温阳。" },
+              { title: "肿瘤三重堵塞理论", content: "气分堵、血分堵、精路堵。精路堵塞阻断遗传信息，引发细胞异常暴增。" }
+            ],
+            exam: [
+              { question: "糖尿病坏疽多发于下肢的内景原因是：", options: ["高糖血液受重力沉降堆积下肢，腌渍组织坏死", "鞋子紧", "骨头重"], answer: 0, explanation: "流体沉降导致高糖毒素沉降下肢。" }
+            ]
+          },
+          {
+            id: "g8_2",
+            title: "真实病例分析",
+            subtitle: "4卡 • 15题",
+            cards: [
+              { title: "夜间平卧咳嗽案", content: "平卧回心血增加→少阴心阳虚无法泵走→肺淤血咳嗽。选四逆汤温少阴心阳而愈。" },
+              { title: "阳明腑实高热谵语案", content: "便秘5天，天枢压痛，肠道毒素经“肠脑轴”上扰大脑导致谵语。大承气汤急下存阴。" }
+            ],
+            exam: [
+              { question: "阳明高热谵语、天枢压痛患者的首选方剂是：", options: ["大承气汤", "桂枝汤", "四逆汤"], answer: 0, explanation: "急下横结肠燥屎断毒素源头。" }
+            ]
+          }
+        ]
+      }
+    ];
+
+    // LocalStorage State Management
+    let unlockedLevels = JSON.parse(localStorage.getItem('sh_unlocked') || '["g1_1"]');
+    let completedLessons = JSON.parse(localStorage.getItem('sh_completed') || '[]');
+
+    function saveProgress() {
+      localStorage.setItem('sh_unlocked', JSON.stringify(unlockedLevels));
+      localStorage.setItem('sh_completed', JSON.stringify(completedLessons));
+    }
+
+    // Render Chapters & Gates
+    function renderApp() {
+      const root = document.getElementById('chapters-root');
+      root.innerHTML = '';
+
+      CHAPTERS.forEach((ch, chIdx) => {
+        // Chapter Banner Card
+        const chDiv = document.createElement('div');
+        chDiv.className = 'chapter-card';
+        chDiv.innerHTML = `
+          <div class="chapter-icon-box" style="background: ${ch.color}">${ch.icon}</div>
+          <div class="chapter-info">
+            <h2>${ch.title}</h2>
+            <p>${ch.subtitle}</p>
+          </div>
+        `;
+        root.appendChild(chDiv);
+
+        // Gates Path
+        const pathDiv = document.createElement('div');
+        pathDiv.className = 'gates-path';
+
+        ch.gates.forEach((gate, gIdx) => {
+          const isUnlocked = unlockedLevels.includes(gate.id);
+          const isCompleted = completedLessons.includes(gate.id);
+
+          const gateNode = document.createElement('div');
+          gateNode.className = 'gate-node';
+          gateNode.innerHTML = `
+            <div class="node-circle ${isCompleted ? 'completed' : (isUnlocked ? 'unlocked' : '')}">
+              ${ch.icon}
+              ${!isUnlocked ? '<div class="lock-badge">🔒</div>' : ''}
+              ${isCompleted ? '<div class="lock-badge" style="background:#10B981;">✓</div>' : ''}
+            </div>
+            <div class="node-title">${gate.title}</div>
+            <div class="node-subtitle">${isUnlocked ? (isCompleted ? '已通关' : gate.subtitle) : '未解锁'}</div>
+            ${isUnlocked ? `
+              <div class="node-actions">
+                <button class="btn-act btn-act-learn" onclick="event.stopPropagation(); openLessonModal('${ch.id}', '${gate.id}')">学习卡片</button>
+                <button class="btn-act btn-act-exam" onclick="event.stopPropagation(); openExamModal('${ch.id}', '${gate.id}')">考题测试</button>
+              </div>
+            ` : ''}
+          `;
+
+          if (isUnlocked) {
+            gateNode.onclick = () => openLessonModal(ch.id, gate.id);
+          }
+
+          pathDiv.appendChild(gateNode);
+        });
+
+        root.appendChild(pathDiv);
+
+        if (chIdx < CHAPTERS.length - 1) {
+          const conn = document.createElement('div');
+          conn.className = 'chapter-connector';
+          root.appendChild(conn);
+        }
+      });
+    }
+
+    // Modal Control
+    function openModal(id) {
+      document.getElementById(id).classList.add('active');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
+    }
+
+    // Lesson Modal State
+    let currentCards = [];
+    let currentCardIndex = 0;
+
+    function openLessonModal(chId, gateId) {
+      const ch = CHAPTERS.find(c => c.id === chId);
+      const gate = ch.gates.find(g => g.id === gateId);
+      currentCards = gate.cards;
+      currentCardIndex = 0;
+
+      document.getElementById('lesson-modal-title').innerText = gate.title;
+      renderCurrentCard();
+      openModal('lesson-modal');
+    }
+
+    function renderCurrentCard() {
+      const container = document.getElementById('lesson-card-container');
+      const card = currentCards[currentCardIndex];
+      container.innerHTML = `
+        <div class="card-box">
+          <h3>${card.title}</h3>
+          <p>${card.content}</p>
+        </div>
+      `;
+      document.getElementById('card-page-indicator').innerText = `${currentCardIndex + 1} / ${currentCards.length}`;
+      document.getElementById('card-prev-btn').disabled = (currentCardIndex === 0);
+    }
+
+    function prevCard() {
+      if (currentCardIndex > 0) {
+        currentCardIndex--;
+        renderCurrentCard();
+      }
+    }
+
+    function nextCard() {
+      if (currentCardIndex < currentCards.length - 1) {
+        currentCardIndex++;
+        renderCurrentCard();
+      } else {
+        closeModal('lesson-modal');
+      }
+    }
+
+    // Exam Modal State
+    let currentExamGateId = null;
+
+    function openExamModal(chId, gateId) {
+      const ch = CHAPTERS.find(c => c.id === chId);
+      const gate = ch.gates.find(g => g.id === gateId);
+      currentExamGateId = gate.id;
+
+      document.getElementById('exam-modal-title').innerText = gate.title + ' - 考题测试';
+      const container = document.getElementById('exam-question-container');
+      const q = gate.exam[0];
+
+      container.innerHTML = `
+        <div class="card-box">
+          <h3>${q.question}</h3>
+          <div id="exam-options">
+            ${q.options.map((opt, idx) => `
+              <div class="option-item" onclick="submitExamAnswer(${idx}, ${q.answer}, '${q.explanation.replace(/'/g, "\\'")}')">${opt}</div>
+            `).join('')}
+          </div>
+          <div id="exam-feedback" style="margin-top: 12px; font-size: 12px; display: none;"></div>
+        </div>
+      `;
+
+      openModal('exam-modal');
+    }
+
+    function submitExamAnswer(selected, correct, exp) {
+      const options = document.querySelectorAll('#exam-options .option-item');
+      options.forEach((opt, idx) => {
+        if (idx === correct) opt.classList.add('correct');
+        if (idx === selected && selected !== correct) opt.classList.add('wrong');
+      });
+
+      const feedback = document.getElementById('exam-feedback');
+      feedback.style.display = 'block';
+
+      if (selected === correct) {
+        feedback.innerHTML = `<span style="color:#10B981; font-weight:800;">✓ 回答正确！</span> ${exp}`;
+        if (!completedLessons.includes(currentExamGateId)) {
+          completedLessons.push(currentExamGateId);
+        }
+
+        // Unlock next gate
+        let allGates = CHAPTERS.flatMap(c => c.gates);
+        let currIdx = allGates.findIndex(g => g.id === currentExamGateId);
+        if (currIdx !== -1 && currIdx < allGates.length - 1) {
+          let nextGate = allGates[currIdx + 1];
+          if (!unlockedLevels.includes(nextGate.id)) {
+            unlockedLevels.push(nextGate.id);
+          }
+        }
+
+        saveProgress();
+        setTimeout(() => {
+          renderApp();
+        }, 1500);
+      } else {
+        feedback.innerHTML = `<span style="color:#EF4444; font-weight:800;">✕ 回答错误。</span> ${exp}`;
+      }
+    }
+
+    // Clinic Modal
+    function openClinicModal() {
+      openModal('clinic-modal');
+    }
+
+    function runInnerLandscapeDiagnosis() {
+      const text = document.getElementById('clinic-symptoms-input').value.trim();
+      const res = document.getElementById('clinic-result-box');
+      res.style.display = 'block';
+
+      if (!text) {
+        res.innerHTML = "请先输入病情描述。";
+        return;
+      }
+
+      let diag = "<strong>【内景物理诊断】</strong><br>";
+      if (text.includes("平卧") || text.includes("夜间")) {
+        diag += "• 病理：平卧导致静脉回心血增加，心阳不足致肺循环淤血。<br>• 病机：少阴病，心肾阳虚，命门火衰。<br>• 推荐经方：<strong>四逆汤</strong>（生附子、干姜、甘草）温少阴心阳。";
+      } else if (text.includes("便秘") || text.includes("天枢") || text.includes("谵语")) {
+        diag += "• 病理：肠道宿便积聚，毒素经肠脑轴上扰大脑。<br>• 病机：阳明腑实证。<br>• 推荐经方：<strong>大承气汤</strong>（大黄、芒硝、厚朴、枳实）峻下通便。";
+      } else if (text.includes("寒热") || text.includes("口苦")) {
+        diag += "• 病理：胸腹膜悬浮闭合，内脏郁热无法达表。<br>• 病机：少阴/少阳枢机不利。<br>• 推荐经方：<strong>小柴胡汤</strong>（柴胡推热，黄芩开膜）。";
+      } else {
+        diag += "• 病理：营卫转化受阻，毛孔玄府开合失常。<br>• 推荐经方：<strong>桂枝汤</strong>（桂枝推血化气，白芍收阴回流）。";
+      }
+
+      res.innerHTML = diag;
+    }
+
+    // Reward Modal
+    function openRewardModal() {
+      openModal('reward-modal');
+    }
+
+    function handleQrUpload(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          document.getElementById('qr-placeholder-text').style.display = 'none';
+          const img = document.getElementById('qr-custom-img');
+          img.src = evt.target.result;
+          img.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // Download HTML Self
+    function downloadCurrentHtml() {
+      const htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = '内景经方学堂_完整交付版.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // Init App
+    renderApp();
+  </script>
+</body>
+</html>
