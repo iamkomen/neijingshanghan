@@ -6,7 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Heart, Sparkles, CheckCircle, AlertTriangle, ArrowRight, ShieldCheck, Award, HelpCircle, BookOpenCheck } from 'lucide-react';
 import { LevelGate, Question, UserState } from '../types';
-import { TOPICS } from '../data/lessons';
+import { LEVEL_GATES, TOPICS, buildRandomizedExamPaper, getStandardizedQuestionsForGate } from '../data/lessons';
 import { saveWrongQuestion } from '../utils/wrongQuestions';
 
 interface ExamModalProps {
@@ -26,54 +26,23 @@ export default function ExamModal({ gate, userState, onClose, onPass, onLoseHear
   const [correctCount, setCorrectCount] = useState(0);
   const [examFinished, setExamFinished] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [aiGeneratedCount, setAiGeneratedCount] = useState(0);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
 
-  // Scramble a backup static question to prevent identical scenarios when offline
-  const scrambleQuestion = (q: Question): Question => {
-    const maleNames = ['张大伯', '李先生', '王大爷', '赵师傅', '小刘', '孙大叔'];
-    const femaleNames = ['陈大娘', '李女士', '赵大妈', '张大姐', '小吴', '周阿姨'];
-    const ages = [28, 35, 42, 56, 63, 71];
-
-    const isFemale = Math.random() > 0.5;
-    const name = isFemale 
-      ? femaleNames[Math.floor(Math.random() * femaleNames.length)]
-      : maleNames[Math.floor(Math.random() * maleNames.length)];
-    const age = ages[Math.floor(Math.random() * ages.length)];
-
-    let scrambledText = q.question;
-    // Replace typical case starters if matched
-    scrambledText = scrambledText.replace(/一位\d+岁的(男性|女性|老太太|患者)/, `一位 ${age} 岁的${isFemale ? '女性' : '男性'}患者 (${name})`);
-    scrambledText = scrambledText.replace(/患者，\d+岁/, `${name}，${age}岁`);
-
-    return {
-      ...q,
-      question: scrambledText
-    };
+  // Helper to load randomized question paper with shuffled questions and shuffled options
+  const loadExamPaper = () => {
+    setLoading(true);
+    const levelTopics = (gate.topics || []).map(tid => TOPICS[tid]).filter(Boolean);
+    // Retrieve full offline standardized question pool for this gate
+    const rawPool = getStandardizedQuestionsForGate(gate, levelTopics);
+    // Shuffle question order & shuffle options order for each question
+    const paper = buildRandomizedExamPaper(rawPool, 5);
+    setQuestions(paper);
+    setLoading(false);
   };
 
   useEffect(() => {
-    setLoading(true);
-    
-    // Get all topics for the current gate
-    const levelTopics = gate.topics.map(tid => TOPICS[topicIdMap(tid)]).filter(Boolean);
-    
-    // Extract pre-coded exam questions from all these topics
-    const baseQuestions = levelTopics.flatMap(t => t.examQuestions || []);
-    
-    // Shuffle the available questions to ensure a dynamic exam experience
-    const shuffled = [...baseQuestions].sort(() => Math.random() - 0.5);
-    
-    // Select up to 5 questions (or all of them if fewer than 5) and scramble their patient scenarios (names/ages)
-    const selectedQuestions = shuffled.slice(0, 5).map(q => scrambleQuestion(q));
-    
-    setQuestions(selectedQuestions);
-    setAiGeneratedCount(0); // 0 since we are using local high-fidelity question pool
-    setLoading(false);
+    loadExamPaper();
   }, [gate]);
-
-  // Mini utility map
-  const topicIdMap = (id: string) => id;
 
   const handleSelectOption = (option: string) => {
     if (isAnswerChecked) return;
@@ -107,6 +76,7 @@ export default function ExamModal({ gate, userState, onClose, onPass, onLoseHear
         options: currentQ.options,
         answer: currentQ.answer,
         explanation: currentQ.explanation,
+        errorAttribution: currentQ.errorAttribution || `误选“${selectedOption}”，主要是混淆了该考点在内景流体、玄府通透性或脏腑气化上的作用机理。正解应从《伤寒论》人体客观物理病机深入理解。`,
         userAnswer: selectedOption
       });
     }
@@ -217,14 +187,7 @@ export default function ExamModal({ gate, userState, onClose, onPass, onLoseHear
                       setCorrectCount(0);
                       setSelectedOption(null);
                       setIsAnswerChecked(false);
-                      setLoading(true);
-                      setTimeout(() => {
-                        const levelTopics = gate.topics.map(tid => TOPICS[tid]).filter(Boolean);
-                        const baseQuestions = levelTopics.flatMap(t => t.examQuestions || []);
-                        const shuffled = [...baseQuestions].sort(() => Math.random() - 0.5);
-                        setQuestions(shuffled.slice(0, 5).map(q => scrambleQuestion(q)));
-                        setLoading(false);
-                      }, 400);
+                      loadExamPaper();
                     }}
                     className="flex-1 py-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-md transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
                   >
@@ -393,14 +356,14 @@ export default function ExamModal({ gate, userState, onClose, onPass, onLoseHear
                 })}
               </div>
 
-              {/* Verified explanations reveal */}
+              {/* Verified explanations & Error Attribution Analysis reveal */}
               {isAnswerChecked && (
-                <div className={`p-4 rounded-2xl border text-xs leading-relaxed transition-all ${
+                <div className={`p-4 rounded-2xl border text-xs leading-relaxed transition-all space-y-2 ${
                   isCorrect
                     ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-950 dark:text-emerald-100'
                     : 'bg-red-50 dark:bg-red-950/40 border-red-300 dark:border-red-800 text-red-950 dark:text-red-100'
                 }`}>
-                  <p className="font-bold mb-1 flex items-center justify-between">
+                  <p className="font-bold flex items-center justify-between">
                     <span>{isCorrect ? '✅ 答对了！' : '❌ 答错了，生命值 -1'}</span>
                     {!isCorrect && (
                       <span className="text-[10px] font-bold bg-red-100 dark:bg-red-950/80 text-red-700 dark:text-red-300 px-2 py-0.5 rounded-full flex items-center gap-1">
@@ -408,9 +371,18 @@ export default function ExamModal({ gate, userState, onClose, onPass, onLoseHear
                       </span>
                     )}
                   </p>
-                  <p className="font-mono leading-normal">
-                    <strong>内景考考点分析：</strong>{currentQ.explanation}
-                  </p>
+                  
+                  <div className="font-mono leading-relaxed bg-white/60 dark:bg-black/30 p-2.5 rounded-xl border border-emerald-200/50 dark:border-emerald-800/50">
+                    <strong className="text-emerald-700 dark:text-emerald-300 block mb-0.5">【内景考点正解】</strong>
+                    {currentQ.explanation}
+                  </div>
+
+                  {!isCorrect && (
+                    <div className="font-mono leading-relaxed bg-red-100/70 dark:bg-red-950/70 p-2.5 rounded-xl border border-red-200/80 dark:border-red-800/80 text-red-900 dark:text-red-200">
+                      <strong className="text-red-700 dark:text-red-300 block mb-0.5">【内景病机·错误归因分析】</strong>
+                      {currentQ.errorAttribution || `误选“${selectedOption}”，主要是混淆了该考点在内景流体、玄府通透性或脏腑气化上的作用机理。正解应从《伤寒论》人体客观物理病机深入理解。`}
+                    </div>
+                  )}
                 </div>
               )}
             </div>

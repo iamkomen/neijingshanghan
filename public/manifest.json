@@ -1,0 +1,17 @@
+{
+  "short_name": "伤寒内景",
+  "name": "《伤寒论》物理内景与经方客观辨证系统",
+  "description": "基于六经气化、玄府微孔流体物理与多邻国游戏化模式的中医伤寒论内景学习与诊断平台",
+  "icons": [
+    {
+      "src": "/src/assets/images/tcm_app_logo_1785645956126.jpg",
+      "type": "image/jpeg",
+      "sizes": "192x192 512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#1c1917",
+  "theme_color": "#1c1917",
+  "display": "standalone",
+  "orientation": "portrait"
+}

@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import * as Icons from 'lucide-react';
 import { UserState, LevelGate } from '../types';
 import { CHAPTERS, TOPICS, LEVEL_GATES } from '../data/lessons';
+import SixMeridianInnerLandscape from './SixMeridianInnerLandscape';
 
 interface StageMapProps {
   userState: UserState;
@@ -64,17 +65,26 @@ export default function StageMap({
       
       {/* HERO BANNER CARD */}
       <div className="w-full rounded-3xl overflow-hidden shadow-lg border border-amber-200/80 dark:border-amber-900/60 mb-5 relative group">
-        <div className="h-44 w-full relative overflow-hidden bg-gradient-to-r from-amber-950 via-red-950 to-stone-900 p-5 flex flex-col justify-end text-white">
-          <div className="absolute top-4 right-4 w-24 h-24 rounded-full bg-amber-500/10 blur-xl"></div>
-          <span className="text-[10px] font-mono font-bold tracking-widest text-amber-300 uppercase bg-amber-950/80 border border-amber-500/40 px-2.5 py-0.5 rounded-full w-fit mb-1.5 backdrop-blur-md">
-            伤寒六经 · 病理知识图谱
-          </span>
-          <h1 className="text-lg md:text-xl font-extrabold tracking-tight font-serif text-amber-50 flex items-center gap-2">
-            《伤寒论》物理内景与临床案证
-          </h1>
-          <p className="text-xs text-amber-200/80 font-medium line-clamp-1 mt-0.5">
-            以六经为纲，以玄府气化为理，通达 397 法与经方精准辨析
-          </p>
+        <div className="h-44 w-full relative overflow-hidden flex flex-col justify-end text-white p-5">
+          <img 
+            src="/src/assets/images/tcm_banner_hero_1785645997363.jpg" 
+            alt="伤寒论物理内景与临床案证" 
+            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+            referrerPolicy="no-referrer"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+          
+          <div className="relative z-10">
+            <span className="text-[10px] font-mono font-bold tracking-widest text-amber-300 uppercase bg-amber-950/80 border border-amber-500/40 px-2.5 py-0.5 rounded-full w-fit mb-1.5 backdrop-blur-md">
+              伤寒六经 · 病理知识图谱
+            </span>
+            <h1 className="text-lg md:text-xl font-extrabold tracking-tight font-serif text-amber-50 flex items-center gap-2">
+              《伤寒论》物理内景与临床案证
+            </h1>
+            <p className="text-xs text-amber-200/90 font-medium line-clamp-1 mt-0.5">
+              以六经为纲，以玄府气化为理，通达 397 法与经方精准辨析
+            </p>
+          </div>
         </div>
       </div>
 
@@ -105,21 +115,26 @@ export default function StageMap({
           <Icons.ChevronRight className="w-5 h-5 text-amber-300 group-hover:translate-x-1 transition-transform shrink-0" />
         </div>
       )}
-      <div className="w-full bg-emerald-50/90 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/80 rounded-3xl p-4 mb-5 flex items-center gap-4 shadow-sm relative">
-        <div className="w-12 h-12 rounded-2xl border-2 border-emerald-400 dark:border-emerald-600 shadow-md shrink-0 bg-emerald-600 text-white flex items-center justify-center font-serif font-bold text-xl">
-          岐
+      <div className="w-full bg-emerald-50/90 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/80 rounded-3xl p-4 mb-5 flex items-center gap-4 shadow-sm relative overflow-hidden">
+        <div className="w-12 h-12 rounded-2xl border-2 border-emerald-500 overflow-hidden shadow-md shrink-0 bg-emerald-900 flex items-center justify-center">
+          <img 
+            src="/src/assets/images/qihuang_avatar_1785646108797.jpg" 
+            alt="岐黄导师" 
+            className="w-full h-full object-cover" 
+            referrerPolicy="no-referrer" 
+          />
         </div>
         <div className="flex-1 flex flex-col justify-center relative">
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xs font-bold text-emerald-900 dark:text-emerald-300 font-serif">
               岐黄导师 · 随堂教诲
             </span>
-            <span className="text-[9px] bg-emerald-200 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 font-bold px-1.5 py-0.5 rounded-md">
+            <span className="text-[9px] bg-emerald-200 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 font-bold px-1.5 py-0.5 rounded-md font-mono">
               🔥 第 {userState.streak} 天修业
             </span>
           </div>
-          <p className="text-xs text-emerald-800 dark:text-emerald-300 font-medium leading-relaxed">
-            “六经不离玄府，发汗不离通阴。深研细微病机与临床医案，经方方能随手拈来！”
+          <p className="text-xs text-emerald-800 dark:text-emerald-300 font-medium leading-relaxed font-serif">
+            “六经不离玄府，发汗不离通阴。深研细微病机与客观规律，经方方能随手拈来！”
           </p>
         </div>
       </div>
@@ -165,6 +180,109 @@ export default function StageMap({
         </div>
       </div>
 
+      {/* VERSION 3.0 GAMIFIED CONCEPT PATHWAY GUIDE */}
+      <div className="w-full bg-gradient-to-r from-amber-900/90 via-stone-900 to-amber-950 border-2 border-amber-500/80 rounded-3xl p-4 md:p-5 mb-6 shadow-xl relative overflow-hidden">
+        <div className="absolute -right-6 -bottom-6 text-amber-500/10 font-serif text-8xl font-black pointer-events-none select-none">
+          悟
+        </div>
+        <div className="relative z-10 space-y-3">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <span className="text-[10px] font-mono font-extrabold uppercase tracking-widest text-amber-300 bg-amber-950/90 border border-amber-500/50 px-2.5 py-0.5 rounded-full flex items-center gap-1.5">
+              <Icons.Sparkles className="w-3 h-3 text-amber-400" />
+              v3.0 零基础游戏化攻克模式
+            </span>
+            <span className="text-[11px] font-mono text-amber-200/90 font-bold">
+              每一个关卡攻克 1 个内景物理核心概念
+            </span>
+          </div>
+
+          <h2 className="text-base md:text-lg font-bold font-serif text-amber-100 flex items-center gap-2">
+            <Icons.Target className="w-5 h-5 text-amber-400" />
+            小白玩家《伤寒论》零基础顺序破关路线
+          </h2>
+
+          <p className="text-xs text-amber-200/90 leading-relaxed font-sans">
+            将沉闷的文言条文拆解为像打游戏一样的<strong>“概念卡片 + 内景图谱 + 临床人机问诊”</strong>。不背硬套，从物理流体力学与微血管运转直观搞懂经方，通关即可真正变身伤寒高手！
+          </p>
+
+          {/* Quick Start Action Button */}
+          <div className="flex flex-wrap items-center gap-3 pt-1">
+            <button
+              onClick={() => {
+                const firstUnlockedGate = LEVEL_GATES.find(g => isGateUnlocked(g.id)) || LEVEL_GATES[0];
+                const targetTopic = firstUnlockedGate.topics[0] || 'T1_1';
+                onSelectTopic(targetTopic);
+              }}
+              className="px-5 py-2.5 bg-gradient-to-r from-amber-400 via-amber-500 to-red-500 hover:from-amber-300 hover:to-red-400 text-stone-950 font-extrabold text-xs md:text-sm rounded-xl shadow-lg shadow-amber-500/20 flex items-center gap-2 cursor-pointer transition-all active:scale-95 border border-amber-300"
+            >
+              <Icons.Gamepad2 className="w-4.5 h-4.5 text-stone-950" />
+              <span>🎮 立即开始游戏 (第 1 关概念攻克)</span>
+            </button>
+
+            {onUnlockAllLevels && userState.unlockedLevels.length < LEVEL_GATES.length && (
+              <button
+                onClick={onUnlockAllLevels}
+                className="px-3 py-2 bg-amber-950/80 hover:bg-amber-900 border border-amber-500/50 text-amber-200 font-bold text-xs rounded-xl flex items-center gap-1.5 cursor-pointer transition-all active:scale-95"
+              >
+                <Icons.Unlock className="w-3.5 h-3.5 text-amber-400" />
+                <span>一键全解锁自由破关</span>
+              </button>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+            <div 
+              onClick={() => {
+                const targetGate = LEVEL_GATES.find(g => isGateUnlocked(g.id)) || LEVEL_GATES[0];
+                onSelectTopic(targetGate.topics[0]);
+              }}
+              className="bg-amber-950/60 hover:bg-amber-900/80 border border-amber-600/40 rounded-xl p-2 text-center cursor-pointer transition-all hover:scale-105 active:scale-95"
+            >
+              <span className="text-[10px] text-amber-400 font-mono block">1. 概念解构</span>
+              <span className="text-[11px] font-bold text-amber-100 flex items-center justify-center gap-1">
+                纯物理逻辑 <Icons.ChevronRight className="w-3 h-3 text-amber-400" />
+              </span>
+            </div>
+            <div 
+              onClick={() => {
+                if (onNavigateGraph) onNavigateGraph();
+                else onSelectTopic('T1_1');
+              }}
+              className="bg-amber-950/60 hover:bg-amber-900/80 border border-amber-600/40 rounded-xl p-2 text-center cursor-pointer transition-all hover:scale-105 active:scale-95"
+            >
+              <span className="text-[10px] text-amber-400 font-mono block">2. 图谱观想</span>
+              <span className="text-[11px] font-bold text-amber-100 flex items-center justify-center gap-1">
+                3D/2D双轴立体 <Icons.ChevronRight className="w-3 h-3 text-amber-400" />
+              </span>
+            </div>
+            <div 
+              onClick={() => {
+                const targetGate = LEVEL_GATES.find(g => isGateUnlocked(g.id)) || LEVEL_GATES[0];
+                onStartExam(targetGate.id);
+              }}
+              className="bg-amber-950/60 hover:bg-amber-900/80 border border-amber-600/40 rounded-xl p-2 text-center cursor-pointer transition-all hover:scale-105 active:scale-95"
+            >
+              <span className="text-[10px] text-amber-400 font-mono block">3. 闯关卡考</span>
+              <span className="text-[11px] font-bold text-amber-100 flex items-center justify-center gap-1">
+                互动考题演练 <Icons.ChevronRight className="w-3 h-3 text-amber-400" />
+              </span>
+            </div>
+            <div 
+              onClick={() => {
+                const targetGate = LEVEL_GATES.find(g => isGateUnlocked(g.id)) || LEVEL_GATES[0];
+                onSelectTopic(targetGate.topics[0]);
+              }}
+              className="bg-amber-950/60 hover:bg-amber-900/80 border border-amber-600/40 rounded-xl p-2 text-center cursor-pointer transition-all hover:scale-105 active:scale-95"
+            >
+              <span className="text-[10px] text-amber-400 font-mono block">4. 案证人机</span>
+              <span className="text-[11px] font-bold text-amber-100 flex items-center justify-center gap-1">
+                AI问诊判读 <Icons.ChevronRight className="w-3 h-3 text-amber-400" />
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* 8 CHAPTERS LIST */}
       <div className="w-full flex flex-col space-y-8 relative">
         {CHAPTERS.map((chapter) => {
@@ -173,21 +291,41 @@ export default function StageMap({
           return (
             <div key={chapter.id} className="w-full flex flex-col items-center relative">
               
-              {/* CHAPTER HEADER BANNER CARD (Exact Match with Reference Image) */}
-              <div id={`chapter-card-${chapter.id}`} className="w-full bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 rounded-3xl p-4 shadow-sm flex items-center gap-4 relative z-10">
-                {/* Icon Box */}
-                <div className={`w-14 h-14 rounded-2xl ${style.bg} flex items-center justify-center flex-shrink-0 shadow-sm`}>
-                  {renderIcon(chapter.icon, "w-7 h-7 text-white stroke-[2.2]")}
+              {/* CHAPTER HEADER BANNER CARD */}
+              <div 
+                id={`chapter-card-${chapter.id}`} 
+                onClick={() => {
+                  const unlockedGate = chapter.gates.find(g => isGateUnlocked(g.id)) || chapter.gates[0];
+                  if (unlockedGate) {
+                    if (isGateUnlocked(unlockedGate.id)) {
+                      onSelectTopic(unlockedGate.topics[0]);
+                    } else if (onUnlockGate) {
+                      onUnlockGate(unlockedGate.id);
+                      onSelectTopic(unlockedGate.topics[0]);
+                    }
+                  }
+                }}
+                className="w-full bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 hover:border-amber-400/80 dark:hover:border-amber-500/80 rounded-3xl p-4 shadow-sm hover:shadow-md flex items-center justify-between gap-4 relative z-10 cursor-pointer group transition-all"
+              >
+                <div className="flex items-center gap-4">
+                  {/* Icon Box */}
+                  <div className={`w-14 h-14 rounded-2xl ${style.bg} flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform`}>
+                    {renderIcon(chapter.icon, "w-7 h-7 text-white stroke-[2.2]")}
+                  </div>
+
+                  {/* Chapter Title & Subtitle */}
+                  <div className="flex flex-col justify-center">
+                    <h2 className="text-base md:text-lg font-bold text-zinc-900 dark:text-zinc-100 tracking-tight leading-snug group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                      {chapter.title}
+                    </h2>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium mt-0.5">
+                      {chapter.subtitle}
+                    </p>
+                  </div>
                 </div>
 
-                {/* Chapter Title & Subtitle */}
-                <div className="flex flex-col justify-center">
-                  <h2 className="text-base md:text-lg font-bold text-zinc-900 dark:text-zinc-100 tracking-tight leading-snug">
-                    {chapter.title}
-                  </h2>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium mt-0.5">
-                    {chapter.subtitle}
-                  </p>
+                <div className="hidden sm:flex items-center gap-1 px-3 py-1.5 bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 rounded-xl text-xs font-bold border border-amber-200 dark:border-amber-900/60 group-hover:bg-amber-500 group-hover:text-white transition-all">
+                  <span>▶️ 顺序破关</span>
                 </div>
               </div>
 
@@ -307,55 +445,15 @@ export default function StageMap({
 
       {/* INNER LANDSCAPE FULLSCREEN MODAL */}
       {showLandscapeModal && (
-        <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
-          <div className="bg-zinc-900 border border-amber-500/30 rounded-3xl p-5 max-w-2xl w-full space-y-4 shadow-2xl text-left animate-scaleUp relative overflow-hidden max-h-[90vh] flex flex-col">
-            <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
-                <h3 className="text-sm font-bold text-amber-200 font-serif">
-                  六经气化内景修真图 · AI 高清绘卷
-                </h3>
-              </div>
-              <button
-                onClick={() => setShowLandscapeModal(false)}
-                className="p-1.5 text-zinc-400 hover:text-white bg-zinc-800 rounded-full cursor-pointer transition-colors"
-              >
-                <Icons.X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto space-y-4 pr-1">
-              <div className="rounded-2xl p-6 border border-amber-500/40 shadow-lg bg-gradient-to-br from-amber-950 via-stone-900 to-zinc-950 text-amber-100 flex flex-col items-center justify-center text-center">
-                <Icons.Layers className="w-12 h-12 text-amber-400 mb-2" />
-                <h4 className="text-base font-extrabold font-serif text-amber-200">《伤寒论》六经气化内景全图</h4>
-                <p className="text-xs text-amber-300/80 mt-1 max-w-md">
-                  开、阖、枢六经运行通道 · 气血津液输布模型
-                </p>
-              </div>
-
-              <div className="bg-zinc-800/80 border border-zinc-700/80 rounded-2xl p-4 space-y-2 text-xs text-zinc-300">
-                <h4 className="font-bold text-amber-300 font-serif flex items-center gap-1.5">
-                  <Icons.Sparkles className="w-3.5 h-3.5" />
-                  <span>内景图解核心法门</span>
-                </h4>
-                <p className="leading-relaxed">
-                  <strong>1. 太阳开机：</strong>太阳主表，如同人体最高层之高压水泵，桂枝加速血行化气，麻黄开玄府泄邪。
-                </p>
-                <p className="leading-relaxed">
-                  <strong>2. 阳明阖机：</strong>阳明主里，为燥土大胃，清热白虎、承气通腑，下降里热之源。
-                </p>
-                <p className="leading-relaxed">
-                  <strong>3. 少阳枢机：</strong>少阳枢转于半表半里，小柴胡汤达胸胁气分，和畅枢机。
-                </p>
-              </div>
-            </div>
-
-            <button
-              onClick={() => setShowLandscapeModal(false)}
-              className="w-full py-2.5 bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs rounded-xl transition-all cursor-pointer shadow-md"
-            >
-              关 闭 观 想
-            </button>
+        <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-y-auto animate-fadeIn">
+          <div className="max-w-6xl w-full my-auto animate-scaleUp">
+            <SixMeridianInnerLandscape
+              onSelectTopic={(topicId) => {
+                setShowLandscapeModal(false);
+                onSelectTopic(topicId);
+              }}
+              onClose={() => setShowLandscapeModal(false)}
+            />
           </div>
         </div>
       )}
@@ -391,12 +489,14 @@ export default function StageMap({
               <button
                 onClick={() => {
                   if (onUnlockGate) onUnlockGate(selectedLockedGate.id);
+                  const targetTopic = selectedLockedGate.topics[0] || 'T1_1';
+                  onSelectTopic(targetTopic);
                   setSelectedLockedGate(null);
                 }}
                 className="w-full py-2.5 px-4 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow-md transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <Icons.Unlock className="w-4 h-4" />
-                <span>⚡ 直接解锁本关</span>
+                <span>⚡ 解锁并开始关卡学习</span>
               </button>
 
               {onUnlockAllLevels && (

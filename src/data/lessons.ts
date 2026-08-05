@@ -9,10 +9,26 @@ import { TOPICS_CH1_CH2 } from './topics_ch1_ch2';
 import { TOPICS_CH3_CH4 } from './topics_ch3_ch4';
 import { TOPICS_CH5_CH6 } from './topics_ch5_ch6';
 import { TOPICS_CH7_CH8 } from './topics_ch7_ch8';
+import { TOPICS_CH10 } from './topics_ch10';
 import { TOPICS_LIUJING_DEEP } from './topics_liujing_deep';
 import { CLINICAL_CASES_20, CASE_UI_CONFIG } from './clinical_cases';
+import { 
+  STANDARDIZED_GATE_QUESTIONS, 
+  shuffleArray, 
+  buildRandomizedExamPaper, 
+  getStandardizedQuestionsForGate 
+} from './standardized_question_bank';
 
-export { CHAPTERS, LEVEL_GATES, CLINICAL_CASES_20, CASE_UI_CONFIG };
+export { 
+  CHAPTERS, 
+  LEVEL_GATES, 
+  CLINICAL_CASES_20, 
+  CASE_UI_CONFIG, 
+  STANDARDIZED_GATE_QUESTIONS, 
+  shuffleArray, 
+  buildRandomizedExamPaper, 
+  getStandardizedQuestionsForGate 
+};
 
 // Map the 20 clinical cases into corresponding TOPICS so each topic contains structured clinical cases
 const rawTopics: Record<string, Topic> = {
@@ -20,6 +36,7 @@ const rawTopics: Record<string, Topic> = {
   ...TOPICS_CH3_CH4,
   ...TOPICS_CH5_CH6,
   ...TOPICS_CH7_CH8,
+  ...TOPICS_CH10,
   ...TOPICS_LIUJING_DEEP
 };
 

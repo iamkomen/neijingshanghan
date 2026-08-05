@@ -11,6 +11,7 @@ export interface Question {
   options: string[]; // For multiple choice or source columns
   answer: string;    // Correct option, or matched index mapping, or sorted string list
   explanation: string;
+  errorAttribution?: string; // 内景病机错误归因分析：解析误选非正确项时，在人体客观内景/气化流体/微循环机制上的思维误区
   clauseId?: string; // Optional Shanghan clause reference (e.g. "第1条")
   patientCase?: {
     symptoms: string;

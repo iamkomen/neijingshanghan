@@ -10,6 +10,7 @@ export interface WrongQuestionItem {
   options: string[];
   answer: string;
   explanation: string;
+  errorAttribution?: string;
   userAnswer?: string;
   timestamp: number;
 }

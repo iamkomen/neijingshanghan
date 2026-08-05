@@ -1,0 +1,15 @@
+{
+  "appId": "com.neijing.tcm.shanghan",
+  "appName": "伤寒论物理内景",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#1c1917",
+      "showSpinner": false
+    }
+  }
+}

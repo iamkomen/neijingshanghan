@@ -189,9 +189,17 @@ export default function WrongQuestionsModal({ onClose }: WrongQuestionsModalProp
                         </button>
                       </div>
                     ) : (
-                      <div className="bg-amber-50/70 dark:bg-amber-950/20 border-l-4 border-amber-500 rounded-r-xl p-3.5 text-xs text-amber-900 dark:text-amber-200 space-y-1">
-                        <p className="font-bold">【内景物理解析】</p>
-                        <p className="leading-relaxed font-sans">{item.explanation}</p>
+                      <div className="bg-amber-50/70 dark:bg-amber-950/20 border-l-4 border-amber-500 rounded-r-xl p-3.5 text-xs text-amber-900 dark:text-amber-200 space-y-2">
+                        <div>
+                          <p className="font-bold text-emerald-800 dark:text-emerald-300">【内景物理正解】</p>
+                          <p className="leading-relaxed font-sans">{item.explanation}</p>
+                        </div>
+                        {item.errorAttribution && (
+                          <div className="pt-2 border-t border-amber-200/60 dark:border-amber-800/60">
+                            <p className="font-bold text-red-800 dark:text-red-300">【内景病机·错误归因剖析】</p>
+                            <p className="leading-relaxed font-sans text-red-900/90 dark:text-red-200">{item.errorAttribution}</p>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>

@@ -373,9 +373,9 @@ export default function OfflineDownloader() {
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>内景解伤寒·多邻国学堂 (100% 离线单页全本)</title>
-  <!-- Tailwind CSS CDN -->
+  <!-- Tailwind CSS CDN Fallback -->
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&family=Inter:wght@400;500;600;700&display=swap');
@@ -396,7 +396,7 @@ export default function OfflineDownloader() {
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     }
 
-    /* Fallback layout & comprehensive UI styles when offline without Tailwind CDN */
+    /* Standard pure CSS utilities for offline rendering without CDN */
     .flex { display: flex; }
     .flex-col { flex-direction: column; }
     .items-center { align-items: center; }
@@ -542,17 +542,14 @@ export default function OfflineDownloader() {
     .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); }
     .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1); }
     .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+    .grid { display: grid; }
+    .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
     .overflow-y-auto { overflow-y: auto; }
     .overflow-x-auto { overflow-x: auto; }
     .overflow-hidden { overflow: hidden; }
     .shrink-0 { flex-shrink: 0; }
     .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .italic { font-style: italic; }
-    .h-2 { height: 0.5rem; }
-    .w-2 { width: 0.5rem; }
-    .w-6 { width: 1.5rem; }
-    .w-9 { width: 2.25rem; }
-    .h-9 { height: 2.25rem; }
 
     /* Custom Scrollbar */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -577,7 +574,34 @@ export default function OfflineDownloader() {
   </script>
 </head>
 <body class="bg-[#f8f4eb] text-[#1c1917] min-h-screen">
-  <div id="offline-app"></div>
+
+  <!-- Static pre-rendered fallback content for Mobile HTML Viewers when JS is restricted -->
+  <div id="offline-app">
+    <header class="sticky top-0 z-40 w-full bg-[#f4efe4] border-b border-[#e2d8c7] px-4 py-3 flex justify-between items-center shadow-xs">
+      <div class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-xl bg-[#b91c1c] flex items-center justify-center text-white font-serif font-bold text-lg shadow-sm">伤</div>
+        <div>
+          <h1 class="text-sm font-extrabold text-[#1c1917] font-serif">伤寒内景多邻国</h1>
+          <p class="text-[10px] text-[#78716c] font-mono">100% 离线单页全本运行库 (9大章全集)</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-[11px] bg-[#dcfce7] text-[#14532d] px-2.5 py-1 rounded-full font-extrabold">✅ 全本离线已装载</span>
+      </div>
+    </header>
+
+    <main class="max-w-2xl mx-auto p-4 space-y-6">
+      <div class="bg-[#fdf8ee] border border-[#fde68a] rounded-2xl p-4 text-xs text-[#78350f] space-y-2 shadow-xs">
+        <div class="font-extrabold font-serif text-sm text-[#b45309] flex items-center gap-2">
+          <span>📖 离线单页已加载完成</span>
+        </div>
+        <p class="leading-relaxed">
+          全套 9 大章节经方经典、白话物理通解、临床案证与速记歌诀已完整内置。
+          若您是在手机默认「文件查看器」中打开，如需无缝互动交互与随堂答题，请在右上角菜单中选择<strong>「用浏览器打开」</strong>或<strong>「用 Chrome 打开」</strong>！
+        </p>
+      </div>
+    </main>
+  </div>
 
   <script>
     (function() {
@@ -676,7 +700,9 @@ export default function OfflineDownloader() {
         function renderFormattedMarkdown(text, themeColor) {
           if (!text) return '';
           themeColor = themeColor || 'zinc';
-          var parts = text.split(/(\*\*[^*]+\*\*)/g);
+          // Use new RegExp with escaped backslashes to avoid template literal escaping issues
+          var boldRegex = new RegExp('(\\\\*\\\\*[^*]+\\\\*\\\\*)', 'g');
+          var parts = text.split(boldRegex);
           return parts.map(function(part) {
             if (part.indexOf('**') === 0 && part.lastIndexOf('**') === part.length - 2) {
               var content = part.slice(2, -2).trim();
@@ -713,7 +739,8 @@ export default function OfflineDownloader() {
           }
 
           if (trim.indexOf('经典依据') !== -1 || trim.indexOf('理论来源') !== -1 || trim.indexOf('伤寒论') !== -1 || trim.indexOf('金匮要略') !== -1 || trim.indexOf('黄帝内经') !== -1 || trim.indexOf('原文') !== -1) {
-            var cleaned = trim.replace(/^[-* ]*\*\*(理论来源|经典依据|原文)\*\*[:：]?\s*/i, '').replace(/^📖\s*/, '');
+            var re1 = new RegExp('^[-* ]*\\\\*\\\\*(理论来源|经典依据|原文)\\\\*\\\\*[:：]?\\\\s*', 'i');
+            var cleaned = trim.replace(re1, '').replace(/^📖\s*/, '');
             var iconUri = getAssetUri('icon_yuanwen');
             var iconTag = iconUri ? '<img src="' + iconUri + '" class="w-3.5 h-3.5 inline-block shrink-0" alt="" />' : '📜';
             return '<div class="bg-[#faf2f2] border-l-4 border-[#b91c1c] rounded-r-2xl p-4 text-xs space-y-2 my-3.5 border border-[#f5d0d0]/60">' +
@@ -728,7 +755,8 @@ export default function OfflineDownloader() {
           }
 
           if (trim.indexOf('白话解读') !== -1 || trim.indexOf('物理内景') !== -1 || trim.indexOf('理论通解') !== -1 || trim.indexOf('核心原理') !== -1 || trim.indexOf('核心要点') !== -1 || trim.indexOf('📌') === 0 || trim.indexOf('💡') === 0) {
-            var cleaned2 = trim.replace(/^[-* ]*\*\*(白话解读|物理内景|核心定义|核心要点)\*\*[:：]?\s*/i, '').replace(/^[📌💡]\s*/, '');
+            var re2 = new RegExp('^[-* ]*\\\\*\\\\*(白话解读|物理内景|核心定义|核心要点)\\\\*\\\\*[:：]?\\\\s*', 'i');
+            var cleaned2 = trim.replace(re2, '').replace(/^[📌💡]\s*/, '');
             var iconUri2 = getAssetUri('icon_baihua');
             var iconTag2 = iconUri2 ? '<img src="' + iconUri2 + '" class="w-3.5 h-3.5 inline-block shrink-0" alt="" />' : '💡';
             return '<div class="bg-[#f0f7f7] border-l-4 border-[#0d5d56] rounded-r-2xl p-4 text-xs space-y-2 my-3.5 border border-[#c2f0ec]/60">' +
@@ -743,7 +771,8 @@ export default function OfflineDownloader() {
           }
 
           if (trim.indexOf('临床案例') !== -1 || trim.indexOf('误辨案例') !== -1 || trim.indexOf('实战案例') !== -1 || trim.indexOf('案例分析') !== -1 || trim.indexOf('患者主诉') !== -1 || trim.indexOf('📋') === 0) {
-            var cleaned3 = trim.replace(/^[-* ]*\*\*(临床案例|误辨案例|实战案例|案例)\*\*[:：]?\s*/i, '').replace(/^📋\s*/, '');
+            var re3 = new RegExp('^[-* ]*\\\\*\\\\*(临床案例|误辨案例|实战案例|案例)\\\\*\\\\*[:：]?\\\\s*', 'i');
+            var cleaned3 = trim.replace(re3, '').replace(/^📋\s*/, '');
             var iconUri3 = getAssetUri('icon_anzheng');
             var iconTag3 = iconUri3 ? '<img src="' + iconUri3 + '" class="w-3.5 h-3.5 inline-block shrink-0" alt="" />' : '📋';
             return '<div class="bg-[#fdf8ee] border-l-4 border-[#b45309] rounded-r-2xl p-4 text-xs text-[#78350f] space-y-2 my-3.5 border border-[#fde68a]/60">' +
@@ -758,7 +787,8 @@ export default function OfflineDownloader() {
           }
 
           if (trim.indexOf('记忆口诀') !== -1 || trim.indexOf('口诀') !== -1 || trim.indexOf('歌诀') !== -1 || trim.indexOf('方歌') !== -1 || trim.indexOf('🔑') === 0) {
-            var cleaned4 = trim.replace(/^[-* ]*\*\*(记忆口诀|口诀|歌诀)\*\*[:：]?\s*/i, '').replace(/^🔑\s*/, '');
+            var re4 = new RegExp('^[-* ]*\\\\*\\\\*(记忆口诀|口诀|歌诀)\\\\*\\\\*[:：]?\\\\s*', 'i');
+            var cleaned4 = trim.replace(re4, '').replace(/^🔑\s*/, '');
             var iconUri4 = getAssetUri('icon_koujue');
             var iconTag4 = iconUri4 ? '<img src="' + iconUri4 + '" class="w-3.5 h-3.5 inline-block shrink-0" alt="" />' : '🔑';
             return '<div class="bg-[#f8f5fa] border-l-4 border-[#7e22ce] rounded-r-2xl p-4 text-xs text-[#581c87] space-y-2 my-3.5 font-mono border border-[#e9d5ff]/60">' +
@@ -773,7 +803,8 @@ export default function OfflineDownloader() {
           }
 
           if (trim.indexOf('易错点') !== -1 || trim.indexOf('辨析禁忌') !== -1 || trim.indexOf('临床禁忌') !== -1 || trim.indexOf('⚠️') === 0) {
-            var cleaned5 = trim.replace(/^[-* ]*\*\*(易错点|辨析禁忌|临床禁忌)\*\*[:：]?\s*/i, '').replace(/^[⚠️🚨]\s*/, '');
+            var re5 = new RegExp('^[-* ]*\\\\*\\\\*(易错点|辨析禁忌|临床禁忌)\\\\*\\\\*[:：]?\\\\s*', 'i');
+            var cleaned5 = trim.replace(re5, '').replace(/^[⚠️🚨]\s*/, '');
             var iconUri5 = getAssetUri('icon_jinji');
             var iconTag5 = iconUri5 ? '<img src="' + iconUri5 + '" class="w-3.5 h-3.5 inline-block shrink-0" alt="" />' : '⚠️';
             return '<div class="bg-[#fff5f5] border-l-4 border-[#dc2626] rounded-r-2xl p-4 text-xs text-[#991b1b] space-y-2 my-3.5 border border-[#fecdd3]/60">' +
@@ -916,7 +947,7 @@ export default function OfflineDownloader() {
             var blocksHTML = '';
 
             if (lesson && lesson.content) {
-              var rawBlocks = lesson.content.split(/\n\n+/);
+              var rawBlocks = lesson.content.split('\\n\\n');
               blocksHTML = rawBlocks.map(function(b) { return renderCardBlock(b); }).join('');
             }
 

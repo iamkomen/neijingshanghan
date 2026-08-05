@@ -15,12 +15,16 @@ import SettingsPanel from './components/SettingsPanel';
 import PromptHub from './components/PromptHub';
 import StudyJournal from './components/StudyJournal';
 import InnerPhysics3DCanvas from './components/InnerPhysics3DCanvas';
+import InnerMechanismTransmissionGraph from './components/InnerMechanismTransmissionGraph';
 import AuthModal, { UserAccount } from './components/AuthModal';
 import WrongQuestionsModal from './components/WrongQuestionsModal';
 import GraduationModal from './components/GraduationModal';
+import InnerDictModal from './components/InnerDictModal';
+import ColdFluProtocolModal from './components/ColdFluProtocolModal';
 import { UserState } from './types';
 import { LEVEL_GATES, TOPICS } from './data/lessons';
-import { Layers, Sparkles, Download, Settings, GraduationCap, BookOpen, BookMarked, User, BookOpenCheck, Trophy, Network, Compass } from 'lucide-react';
+import { TCM_THEME, COLOR_PALETTE } from './theme';
+import { Layers, Sparkles, Download, Settings, GraduationCap, BookOpen, BookMarked, User, BookOpenCheck, Trophy, Network, Compass, Brain } from 'lucide-react';
 
 export default function App() {
   const [userState, setUserState] = useState<UserState>({
@@ -41,7 +45,9 @@ export default function App() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showWrongQuestions, setShowWrongQuestions] = useState(false);
   const [showGraduation, setShowGraduation] = useState(false);
-  const [currentView, setCurrentView] = useState<'map' | 'graph' | 'physics' | 'journal' | 'clinic' | 'prompts' | 'download' | 'settings'>('map');
+  const [showInnerDictModal, setShowInnerDictModal] = useState(false);
+  const [showColdFluModal, setShowColdFluModal] = useState(false);
+  const [currentView, setCurrentView] = useState<'map' | 'graph' | 'inner-mechanism' | 'physics' | 'journal' | 'clinic' | 'prompts' | 'download' | 'settings'>('map');
   const [activeTopicId, setActiveTopicId] = useState<string | null>(null);
   const [activeGateId, setActiveGateId] = useState<string | null>(null);
 
@@ -292,7 +298,7 @@ export default function App() {
   const progressPct = totalTopics > 0 ? Math.round((userState.completedLessons.length / totalTopics) * 100) : 0;
 
   return (
-    <div className="min-h-screen bg-[#FAF8F2] dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 flex flex-col font-sans antialiased transition-colors duration-300">
+    <div className={`min-h-screen ${TCM_THEME.canvas} flex flex-col font-sans antialiased transition-colors duration-300`}>
       {/* Dynamic Navigation Header */}
       <Header
         userState={userState}
@@ -302,22 +308,26 @@ export default function App() {
         onOpenAuthModal={() => setShowAuthModal(true)}
         onOpenWrongQuestions={() => setShowWrongQuestions(true)}
         onOpenGraduation={() => setShowGraduation(true)}
+        onOpenInnerDict={() => setShowInnerDictModal(true)}
+        onOpenColdFluProtocol={() => setShowColdFluModal(true)}
       />
 
       {/* Main Responsive Grid Layout */}
       <div className="flex flex-1 w-full overflow-hidden">
         
         {/* Left Sidebar (Desktop Only) */}
-        <aside className="hidden lg:flex flex-col w-64 bg-white dark:bg-zinc-900 border-r border-zinc-200/80 dark:border-zinc-800 p-6 gap-6 h-[calc(100vh-4rem)] sticky top-16">
+        <aside className={`hidden lg:flex flex-col w-64 ${TCM_THEME.sidebar} p-6 gap-6 h-[calc(100vh-4rem)] sticky top-16`}>
           <div className="space-y-1.5">
-            <p className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest mb-3">系统导航 / Navigation</p>
+            <p className="text-[10px] font-bold text-[#B45309] dark:text-[#FDE68A] uppercase tracking-widest mb-3 font-mono flex items-center gap-1">
+              <span>系统导航 / Navigation</span>
+            </p>
             
             <button
               onClick={() => setCurrentView('map')}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-xs transition-all ${
                 currentView === 'map'
-                  ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30'
-                  : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800/50'
+                  ? TCM_THEME.sidebarItemActive
+                  : TCM_THEME.sidebarItemInactive
               }`}
             >
               <Layers className="w-4.5 h-4.5" />
@@ -328,20 +338,32 @@ export default function App() {
               onClick={() => setCurrentView('graph')}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-xs transition-all ${
                 currentView === 'graph'
-                  ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30'
-                  : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800/50'
+                  ? TCM_THEME.sidebarItemActive
+                  : TCM_THEME.sidebarItemInactive
               }`}
             >
-              <Network className="w-4.5 h-4.5 text-red-600 dark:text-red-400" />
+              <Network className="w-4.5 h-4.5 text-[#B91C1C] dark:text-red-400" />
               <span>经方关系网络图</span>
+            </button>
+
+            <button
+              onClick={() => setCurrentView('inner-mechanism')}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-xs transition-all ${
+                currentView === 'inner-mechanism'
+                  ? TCM_THEME.sidebarItemActive
+                  : TCM_THEME.sidebarItemInactive
+              }`}
+            >
+              <Brain className="w-4.5 h-4.5 text-[#B45309] dark:text-amber-400" />
+              <span>内景病变机理传变图</span>
             </button>
 
             <button
               onClick={() => setCurrentView('physics')}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-xs transition-all ${
                 currentView === 'physics'
-                  ? 'bg-amber-500 text-stone-950 font-black shadow-md border border-amber-400'
-                  : 'text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30'
+                  ? TCM_THEME.sidebarItemActive
+                  : TCM_THEME.sidebarItemInactive
               }`}
             >
               <Compass className="w-4.5 h-4.5" />
@@ -352,8 +374,8 @@ export default function App() {
               onClick={() => setCurrentView('journal')}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-xs transition-all ${
                 currentView === 'journal'
-                  ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30'
-                  : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800/50'
+                  ? TCM_THEME.sidebarItemActive
+                  : TCM_THEME.sidebarItemInactive
               }`}
             >
               <BookMarked className="w-4.5 h-4.5" />
@@ -362,17 +384,17 @@ export default function App() {
 
             <button
               onClick={() => setShowWrongQuestions(true)}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-xs text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-all cursor-pointer"
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-xs text-[#B45309] dark:text-[#FDE68A] hover:bg-[#FAF7F0] dark:hover:bg-[#2A2622] transition-all cursor-pointer"
             >
-              <BookOpenCheck className="w-4.5 h-4.5 text-amber-600" />
+              <BookOpenCheck className="w-4.5 h-4.5 text-[#B45309]" />
               <span>错题本复习</span>
             </button>
 
             <button
               onClick={() => setShowGraduation(true)}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-xs text-yellow-700 dark:text-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-950/30 transition-all cursor-pointer"
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-xs text-[#B45309] dark:text-[#FDE68A] hover:bg-[#FAF7F0] dark:hover:bg-[#2A2622] transition-all cursor-pointer"
             >
-              <Trophy className="w-4.5 h-4.5 text-yellow-600" />
+              <Trophy className="w-4.5 h-4.5 text-[#B45309]" />
               <span>结业典礼证书</span>
             </button>
 
@@ -380,8 +402,8 @@ export default function App() {
               onClick={() => setCurrentView('clinic')}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-xs transition-all ${
                 currentView === 'clinic'
-                  ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30'
-                  : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800/50'
+                  ? TCM_THEME.sidebarItemActive
+                  : TCM_THEME.sidebarItemInactive
               }`}
             >
               <Sparkles className="w-4.5 h-4.5" />
@@ -392,8 +414,8 @@ export default function App() {
               onClick={() => setCurrentView('prompts')}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-xs transition-all ${
                 currentView === 'prompts'
-                  ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30'
-                  : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800/50'
+                  ? TCM_THEME.sidebarItemActive
+                  : TCM_THEME.sidebarItemInactive
               }`}
             >
               <BookOpen className="w-4.5 h-4.5" />
@@ -404,8 +426,8 @@ export default function App() {
               onClick={() => setCurrentView('download')}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-xs transition-all ${
                 currentView === 'download'
-                  ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30'
-                  : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800/50'
+                  ? TCM_THEME.sidebarItemActive
+                  : TCM_THEME.sidebarItemInactive
               }`}
             >
               <Download className="w-4.5 h-4.5" />
@@ -416,8 +438,8 @@ export default function App() {
               onClick={() => setCurrentView('settings')}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-bold text-xs transition-all ${
                 currentView === 'settings'
-                  ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30'
-                  : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800/50'
+                  ? TCM_THEME.sidebarItemActive
+                  : TCM_THEME.sidebarItemInactive
               }`}
             >
               <Settings className="w-4.5 h-4.5" />
@@ -425,29 +447,29 @@ export default function App() {
             </button>
           </div>
 
-          {/* System Mastery Card */}
-          <div className="mt-auto bg-zinc-900 dark:bg-zinc-950 rounded-2xl p-4 text-white relative overflow-hidden shadow-md">
+          {/* System Mastery Card (New Chinese Style) */}
+          <div className="mt-auto bg-gradient-to-br from-[#1C1917] via-[#2A1D12] to-[#17130E] rounded-2xl p-4 text-white relative overflow-hidden shadow-md border border-[#78350F]">
             <div className="relative z-10">
-              <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">系统修炼掌握度</p>
-              <h3 className="text-sm font-bold mt-1">理论大纲层级</h3>
-              <div className="mt-4 h-1.5 bg-zinc-800 rounded-full">
-                <div className="h-full bg-emerald-400 rounded-full transition-all duration-500" style={{ width: `${progressPct}%` }}></div>
+              <p className="text-[10px] text-[#FDE68A] font-bold uppercase tracking-wider font-mono">系统修炼掌握度</p>
+              <h3 className="text-sm font-bold mt-1 font-serif text-[#FEF3C7]">理论大纲层级</h3>
+              <div className="mt-4 h-1.5 bg-[#38322C] rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-[#B45309] to-[#0D5D56] rounded-full transition-all duration-500" style={{ width: `${progressPct}%` }}></div>
               </div>
-              <p className="text-[10px] mt-2 text-zinc-300">当前进度: {progressPct}% ({userState.completedLessons.length}/{totalTopics})</p>
+              <p className="text-[10px] mt-2 text-[#D6C4A5] font-mono">当前进度: {progressPct}% ({userState.completedLessons.length}/{totalTopics})</p>
             </div>
             <div className="absolute -right-4 -bottom-4 opacity-10">
-              <GraduationCap className="w-20 h-20" />
+              <GraduationCap className="w-20 h-20 text-[#FDE68A]" />
             </div>
           </div>
         </aside>
 
         {/* Center Main Viewport */}
-        <main className="flex-1 p-6 md:p-8 overflow-y-auto bg-[#FAF8F2] dark:bg-zinc-950 relative">
+        <main className="flex-1 p-6 md:p-8 overflow-y-auto bg-[#FAF7F0] dark:bg-[#141210] relative">
           
           {/* FLOATING UNLOCK TOAST NOTIFICATION */}
           {unlockToast && (
-            <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-amber-500 text-white px-5 py-3 rounded-2xl shadow-2xl font-bold text-xs flex items-center gap-2.5 border-2 border-white animate-bounce">
-              <Sparkles className="w-4 h-4 text-amber-200" />
+            <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-[#B45309] text-white px-5 py-3 rounded-2xl shadow-2xl font-bold text-xs flex items-center gap-2.5 border-2 border-[#FDE68A] animate-bounce font-serif">
+              <Sparkles className="w-4 h-4 text-[#FDE68A]" />
               <span>{unlockToast}</span>
             </div>
           )}
@@ -470,6 +492,13 @@ export default function App() {
                   onSelectTopic={handleSelectTopic}
                   unlockedLevels={userState.unlockedLevels}
                   completedLessons={userState.completedLessons}
+                  onNavigateInnerMechanism={() => setCurrentView('inner-mechanism')}
+                />
+              )}
+
+              {currentView === 'inner-mechanism' && (
+                <InnerMechanismTransmissionGraph
+                  onSelectTopic={handleSelectTopic}
                 />
               )}
 
@@ -615,6 +644,18 @@ export default function App() {
           onClose={() => setShowGraduation(false)}
         />
       )}
+
+      {/* INNER LANDSCAPE LIVING DICTIONARY MODAL */}
+      <InnerDictModal
+        isOpen={showInnerDictModal}
+        onClose={() => setShowInnerDictModal(false)}
+      />
+
+      {/* COLD & FLU FAST PROTOCOL & DOSAGE CALCULATOR MODAL */}
+      <ColdFluProtocolModal
+        isOpen={showColdFluModal}
+        onClose={() => setShowColdFluModal(false)}
+      />
     </div>
   );
 }

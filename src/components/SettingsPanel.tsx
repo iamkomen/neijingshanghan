@@ -150,6 +150,49 @@ export default function SettingsPanel({
           </div>
         </div>
 
+        {/* SECTION 3: MILESTONE VERSION SNAPSHOTS & VERSION 3.0 GAMIFICATION */}
+        <div className="border border-amber-200 dark:border-amber-900/60 bg-amber-50/50 dark:bg-amber-950/20 rounded-2xl p-5 space-y-4">
+          <div className="flex items-center justify-between border-b border-amber-200 dark:border-amber-900/40 pb-2.5">
+            <h4 className="text-sm font-extrabold text-amber-900 dark:text-amber-200 font-serif flex items-center gap-2">
+              <Award className="w-5 h-5 text-amber-600" />
+              项目里程碑版本快照与 v3.0 零基础游戏化重铸
+            </h4>
+            <span className="text-[10px] font-mono font-bold bg-amber-600 text-white px-2 py-0.5 rounded-full">
+              PRO v3.0 ONGOING
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+            {/* Version 2.5 Snapshot */}
+            <div className="bg-white dark:bg-zinc-900 p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 space-y-1.5 shadow-2xs">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5">
+                  <CheckCircle className="w-4 h-4 text-emerald-500" />
+                  v2.5 版本快照 (已归档保存)
+                </span>
+                <span className="text-[10px] text-zinc-400 font-mono">2026.07 快照</span>
+              </div>
+              <p className="text-zinc-600 dark:text-zinc-400 text-[11px] leading-relaxed">
+                完成双轴物理病变拓扑图（可自由拖拽节点避让排版重叠）、以及 3D WebGL 全息空间星系网络（宇宙多维节点与光速激光传变）。
+              </p>
+            </div>
+
+            {/* Version 3.0 Rebuild */}
+            <div className="bg-gradient-to-br from-amber-500/10 to-red-500/10 dark:from-amber-950/40 dark:to-red-950/40 p-3.5 rounded-xl border border-amber-400/50 dark:border-amber-700/50 space-y-1.5 shadow-xs">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-amber-900 dark:text-amber-200 flex items-center gap-1.5 font-serif">
+                  <ShieldAlert className="w-4 h-4 text-amber-600" />
+                  v3.0 零基础游戏化重铸 (当前版本)
+                </span>
+                <span className="text-[10px] text-amber-600 font-mono font-bold">最新重铸路线</span>
+              </div>
+              <p className="text-amber-900/80 dark:text-amber-300 text-[11px] leading-relaxed">
+                以 RPG 闯关模式重构整个内景经方知识体系，从小白零基础视角“一个概念一个概念地顺序攻克”，通关即彻底掌握《伤寒论》核心内景物理逻辑。
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* THEORETICAL STATEMENT BRIEFING */}
         <div className="bg-emerald-600/5 dark:bg-zinc-900/30 border border-emerald-500/10 dark:border-zinc-800 rounded-2xl p-5 space-y-3">
           <h4 className="text-sm font-bold text-emerald-800 dark:text-emerald-400 flex items-center gap-1.5">

@@ -320,6 +320,35 @@ export const CHAPTERS: Chapter[] = [
         completed: false
       }
     ]
+  },
+  {
+    id: 'ch10',
+    number: 10,
+    title: '第10章 • 感冒经方诊疗与公益课讲义精要',
+    subtitle: '《中医经方治疗感冒简易应用版》与巧良医公益课最新研讨',
+    icon: 'Thermometer',
+    color: 'amber',
+    bgColor: 'bg-amber-600',
+    gates: [
+      {
+        id: 'g10_1',
+        chapterId: 'ch10',
+        title: '感冒经方三阶决策与加减法',
+        subtitle: '3卡 • 2题',
+        topics: ['T10_1'],
+        unlocked: false,
+        completed: false
+      },
+      {
+        id: 'g10_2',
+        chapterId: 'ch10',
+        title: '公益课内景精要与临床八维',
+        subtitle: '2卡 • 2题',
+        topics: ['T10_2'],
+        unlocked: false,
+        completed: false
+      }
+    ]
   }
 ];
 

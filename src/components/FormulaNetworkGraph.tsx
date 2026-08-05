@@ -10,6 +10,7 @@ import {
   NetworkNode,
   NetworkLink
 } from '../data/formulaNetworkData';
+import Holographic3DGraph from './Holographic3DGraph';
 import {
   Network,
   Search,
@@ -25,30 +26,45 @@ import {
   Lock,
   ExternalLink,
   ChevronRight,
-  Info
+  Info,
+  Brain,
+  Move
 } from 'lucide-react';
 
 interface FormulaNetworkGraphProps {
   onSelectTopic: (topicId: string) => void;
   unlockedLevels?: string[];
   completedLessons?: string[];
+  onNavigateInnerMechanism?: () => void;
 }
 
 export default function FormulaNetworkGraph({
   onSelectTopic,
   unlockedLevels = [],
-  completedLessons = []
+  completedLessons = [],
+  onNavigateInnerMechanism
 }: FormulaNetworkGraphProps) {
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>('f_guizhitang');
   const [activeMeridianFilter, setActiveMeridianFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [viewMode, setViewMode] = useState<'evolution' | 'herbs' | 'all'>('evolution');
+  const [viewMode, setViewMode] = useState<'evolution' | 'herbs' | '3d' | 'all'>('evolution');
+
+  // Custom dragged node positions
+  const [customPositions, setCustomPositions] = useState<{ [id: string]: { x: number; y: number } }>({});
+  const draggingNodeIdRef = useRef<string | null>(null);
+
   const [zoom, setZoom] = useState<number>(1);
   const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [isDraggingPan, setIsDraggingPan] = useState(false);
   const [dragStart, setDragStart] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 
   const svgRef = useRef<SVGSVGElement | null>(null);
+
+  // Get position considering manual drags
+  const getNodePos = (node: NetworkNode) => {
+    if (customPositions[node.id]) return customPositions[node.id];
+    return { x: node.x || 400, y: node.y || 300 };
+  };
 
   // Filter nodes based on Meridian filter, Search Query, and View Mode
   const filteredNodes = useMemo(() => {
@@ -113,14 +129,39 @@ export default function FormulaNetworkGraph({
     return FORMULA_NODES.filter((n) => neighborIds.has(n.id));
   }, [selectedNodeId, connectedLinks]);
 
-  // Drag Pan handling for canvas
+  // Drag Pan & Node Drag handling for canvas
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (e.button !== 0) return; // Only primary mouse button
+    if (e.button !== 0) return;
     setIsDraggingPan(true);
     setDragStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
   };
 
+  const handleNodeMouseDown = (e: React.MouseEvent, nodeId: string) => {
+    e.stopPropagation();
+    draggingNodeIdRef.current = nodeId;
+    setSelectedNodeId(nodeId);
+  };
+
   const handleMouseMove = (e: React.MouseEvent) => {
+    if (draggingNodeIdRef.current) {
+      if (!svgRef.current) return;
+      const rect = svgRef.current.getBoundingClientRect();
+      const rawX = e.clientX - rect.left - pan.x;
+      const rawY = e.clientY - rect.top - pan.y;
+
+      const scaleX = 850 / (rect.width * zoom);
+      const scaleY = 680 / (rect.height * zoom);
+
+      const svgX = Math.min(Math.max(Math.round(rawX * scaleX), 20), 830);
+      const svgY = Math.min(Math.max(Math.round(rawY * scaleY), 20), 660);
+
+      setCustomPositions((prev) => ({
+        ...prev,
+        [draggingNodeIdRef.current!]: { x: svgX, y: svgY }
+      }));
+      return;
+    }
+
     if (!isDraggingPan) return;
     setPan({
       x: e.clientX - dragStart.x,
@@ -129,12 +170,17 @@ export default function FormulaNetworkGraph({
   };
 
   const handleMouseUp = () => {
+    draggingNodeIdRef.current = null;
     setIsDraggingPan(false);
   };
 
   const handleResetZoom = () => {
     setZoom(1);
     setPan({ x: 0, y: 0 });
+  };
+
+  const handleResetPositions = () => {
+    setCustomPositions({});
   };
 
   const getNodeColor = (node: NetworkNode) => {
@@ -185,6 +231,18 @@ export default function FormulaNetworkGraph({
           <p className="text-xs md:text-sm text-[#a8a29e] leading-relaxed max-w-3xl">
             本图谱将《伤寒论》中太阳、阳明、少阳、太阴、少阴、厥阴之<strong>六经气化转化路线</strong>与<strong>核心药味加减化裁逻辑</strong>进行可视化网络连结。点击图中任意经方或药味节点，可高亮关联病机并一键跳转至对应教学关卡！
           </p>
+
+          {onNavigateInnerMechanism && (
+            <div className="pt-2">
+              <button
+                onClick={onNavigateInnerMechanism}
+                className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-stone-950 rounded-xl font-bold text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer"
+              >
+                <Brain className="w-4 h-4" />
+                <span>一键切换至《伤寒病变机理传变图（内景视界）》 →</span>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Decorative Background Symbol */}
@@ -229,6 +287,17 @@ export default function FormulaNetworkGraph({
             >
               全景全拓扑
             </button>
+            <button
+              onClick={() => setViewMode('3d')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
+                viewMode === '3d'
+                  ? 'bg-amber-500 text-stone-950 font-black shadow-sm'
+                  : 'text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-950/40'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>3D全息空间网络</span>
+            </button>
           </div>
 
           {/* Search Box */}
@@ -243,8 +312,16 @@ export default function FormulaNetworkGraph({
             />
           </div>
 
-          {/* Canvas Zoom Controls */}
+          {/* Canvas Zoom & Position Reset Controls */}
           <div className="flex items-center gap-1">
+            <button
+              onClick={handleResetPositions}
+              className="px-2.5 py-1 bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 hover:bg-amber-200 rounded-lg text-xs font-bold flex items-center gap-1 transition-all"
+              title="重置手动拖拽节点的位置"
+            >
+              <Move className="w-3.5 h-3.5" />
+              <span>重置节点位置</span>
+            </button>
             <button
               onClick={() => setZoom((z) => Math.min(z + 0.15, 2.0))}
               className="p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg text-zinc-600 dark:text-zinc-300"
@@ -298,123 +375,134 @@ export default function FormulaNetworkGraph({
         </div>
       </div>
 
+      {/* 3D HOLOGRAPHIC MODE */}
+      {viewMode === '3d' && (
+        <Holographic3DGraph onSelectTopic={onSelectTopic} initialDataType="formula-network" />
+      )}
+
       {/* GRAPH CANVAS & INSPECTOR GRID */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        
-        {/* NETWORK GRAPH CANVAS PANEL */}
-        <div className="lg:col-span-7 bg-[#fffcf7] dark:bg-zinc-900/80 border border-[#ebdcc8] dark:border-zinc-800 rounded-3xl p-4 shadow-sm relative overflow-hidden min-h-[500px] flex flex-col">
-          <div className="flex justify-between items-center mb-2 px-2">
-            <span className="text-xs font-extrabold text-[#0d5d56] dark:text-emerald-400 font-serif flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>拖拽与点击交互网络 (共 {filteredNodes.length} 节点)</span>
-            </span>
-            <span className="text-[10px] text-zinc-400 font-mono">
-              滚轮/长按拖拽画布 • 单击节点高亮
-            </span>
-          </div>
+      {viewMode !== '3d' && (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          
+          {/* NETWORK GRAPH CANVAS PANEL */}
+          <div className="lg:col-span-7 bg-[#fffcf7] dark:bg-zinc-900/80 border border-[#ebdcc8] dark:border-zinc-800 rounded-3xl p-4 shadow-sm relative overflow-hidden min-h-[500px] flex flex-col">
+            <div className="flex justify-between items-center mb-2 px-2">
+              <span className="text-xs font-extrabold text-[#0d5d56] dark:text-emerald-400 font-serif flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>2D 平面拖拽与点击交互网络 (共 {filteredNodes.length} 节点)</span>
+              </span>
+              <span className="text-[10px] text-zinc-400 font-mono">
+                按住节点可任意拖动位置 • 滚轮/拖拽画布
+              </span>
+            </div>
 
-          <div
-            className="flex-1 w-full h-[480px] relative bg-[#fbf8f0] dark:bg-zinc-950 rounded-2xl border border-[#f0e6d6] dark:border-zinc-800/80 overflow-hidden cursor-grab active:cursor-grabbing select-none"
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}
-          >
-            <svg
-              ref={svgRef}
-              className="w-full h-full"
-              viewBox="0 0 850 680"
-              preserveAspectRatio="xMidYMid meet"
+            <div
+              className="flex-1 w-full h-[480px] relative bg-[#fbf8f0] dark:bg-zinc-950 rounded-2xl border border-[#f0e6d6] dark:border-zinc-800/80 overflow-hidden cursor-grab active:cursor-grabbing select-none"
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
             >
-              <defs>
-                {/* Arrow markers */}
-                <marker
-                  id="arrow-default"
-                  viewBox="0 0 10 10"
-                  refX="18"
-                  refY="5"
-                  markerWidth="6"
-                  markerHeight="6"
-                  orient="auto-start-reverse"
-                >
-                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#a8a29e" />
-                </marker>
-                <marker
-                  id="arrow-active"
-                  viewBox="0 0 10 10"
-                  refX="18"
-                  refY="5"
-                  markerWidth="7"
-                  markerHeight="7"
-                  orient="auto-start-reverse"
-                >
-                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#b91c1c" />
-                </marker>
-              </defs>
+              <svg
+                ref={svgRef}
+                className="w-full h-full"
+                viewBox="0 0 850 680"
+                preserveAspectRatio="xMidYMid meet"
+              >
+                <defs>
+                  {/* Arrow markers */}
+                  <marker
+                    id="arrow-default"
+                    viewBox="0 0 10 10"
+                    refX="18"
+                    refY="5"
+                    markerWidth="6"
+                    markerHeight="6"
+                    orient="auto-start-reverse"
+                  >
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#a8a29e" />
+                  </marker>
+                  <marker
+                    id="arrow-active"
+                    viewBox="0 0 10 10"
+                    refX="18"
+                    refY="5"
+                    markerWidth="7"
+                    markerHeight="7"
+                    orient="auto-start-reverse"
+                  >
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#b91c1c" />
+                  </marker>
+                </defs>
 
-              <g transform={`translate(${pan.x}, ${pan.y}) scale(${zoom})`}>
-                {/* LINKS / EDGES */}
-                {filteredLinks.map((link, idx) => {
-                  const sourceNode = FORMULA_NODES.find((n) => n.id === link.source);
-                  const targetNode = FORMULA_NODES.find((n) => n.id === link.target);
-                  if (!sourceNode || !targetNode) return null;
+                <g transform={`translate(${pan.x}, ${pan.y}) scale(${zoom})`}>
+                  {/* LINKS / EDGES */}
+                  {filteredLinks.map((link, idx) => {
+                    const sourceNode = FORMULA_NODES.find((n) => n.id === link.source);
+                    const targetNode = FORMULA_NODES.find((n) => n.id === link.target);
+                    if (!sourceNode || !targetNode) return null;
 
-                  const isSelectedLink =
-                    selectedNodeId &&
-                    (link.source === selectedNodeId || link.target === selectedNodeId);
+                    const srcPos = getNodePos(sourceNode);
+                    const tgtPos = getNodePos(targetNode);
 
-                  const midX = (sourceNode.x! + targetNode.x!) / 2;
-                  const midY = (sourceNode.y! + targetNode.y!) / 2;
+                    const isSelectedLink =
+                      selectedNodeId &&
+                      (link.source === selectedNodeId || link.target === selectedNodeId);
 
-                  return (
-                    <g key={`link-${idx}`}>
-                      <line
-                        x1={sourceNode.x}
-                        y1={sourceNode.y}
-                        x2={targetNode.x}
-                        y2={targetNode.y}
-                        stroke={isSelectedLink ? '#b91c1c' : '#d6cebf'}
-                        strokeWidth={isSelectedLink ? 2.5 : 1.2}
-                        strokeDasharray={link.relationType === 'variation' ? '4,4' : 'none'}
-                        markerEnd={isSelectedLink ? 'url(#arrow-active)' : 'url(#arrow-default)'}
-                        className="transition-all duration-300"
-                      />
-                      {/* Link Relationship Label */}
-                      <text
-                        x={midX}
-                        y={midY - 4}
-                        fill={isSelectedLink ? '#b91c1c' : '#8c8275'}
-                        fontSize="9"
-                        fontWeight={isSelectedLink ? 'bold' : 'normal'}
-                        textAnchor="middle"
-                        className="pointer-events-none select-none font-serif"
+                    const midX = (srcPos.x + tgtPos.x) / 2;
+                    const midY = (srcPos.y + tgtPos.y) / 2;
+
+                    return (
+                      <g key={`link-${idx}`}>
+                        <line
+                          x1={srcPos.x}
+                          y1={srcPos.y}
+                          x2={tgtPos.x}
+                          y2={tgtPos.y}
+                          stroke={isSelectedLink ? '#b91c1c' : '#d6cebf'}
+                          strokeWidth={isSelectedLink ? 2.5 : 1.2}
+                          strokeDasharray={link.relationType === 'variation' ? '4,4' : 'none'}
+                          markerEnd={isSelectedLink ? 'url(#arrow-active)' : 'url(#arrow-default)'}
+                          className="transition-all duration-300"
+                        />
+                        {/* Link Relationship Label */}
+                        <text
+                          x={midX}
+                          y={midY - 4}
+                          fill={isSelectedLink ? '#b91c1c' : '#8c8275'}
+                          fontSize="9"
+                          fontWeight={isSelectedLink ? 'bold' : 'normal'}
+                          textAnchor="middle"
+                          className="pointer-events-none select-none font-serif"
+                        >
+                          {link.label}
+                        </text>
+                      </g>
+                    );
+                  })}
+
+                  {/* NODES */}
+                  {filteredNodes.map((node) => {
+                    const isSelected = selectedNodeId === node.id;
+                    const isNeighbor = neighborNodes.some((n) => n.id === node.id);
+                    const nodeColor = getNodeColor(node);
+                    const pos = getNodePos(node);
+
+                    let radius = 22;
+                    if (node.type === 'meridian') radius = 28;
+                    if (node.type === 'herb') radius = 18;
+
+                    return (
+                      <g
+                        key={node.id}
+                        transform={`translate(${pos.x}, ${pos.y})`}
+                        onMouseDown={(e) => handleNodeMouseDown(e, node.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedNodeId(node.id);
+                        }}
+                        className="cursor-move group"
                       >
-                        {link.label}
-                      </text>
-                    </g>
-                  );
-                })}
-
-                {/* NODES */}
-                {filteredNodes.map((node) => {
-                  const isSelected = selectedNodeId === node.id;
-                  const isNeighbor = neighborNodes.some((n) => n.id === node.id);
-                  const nodeColor = getNodeColor(node);
-
-                  let radius = 22;
-                  if (node.type === 'meridian') radius = 28;
-                  if (node.type === 'herb') radius = 18;
-
-                  return (
-                    <g
-                      key={node.id}
-                      transform={`translate(${node.x}, ${node.y})`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedNodeId(node.id);
-                      }}
-                      className="cursor-pointer group"
-                    >
                       {/* Pulse effect for selected node */}
                       {isSelected && (
                         <circle
@@ -609,6 +697,7 @@ export default function FormulaNetworkGraph({
           )}
         </div>
       </div>
+      )}
     </div>
   );
 }
